@@ -16,8 +16,10 @@ import { LineageView } from "@/components/LineageView";
 import { LineageTree } from "@/components/LineageTree";
 import { ConceptChip } from "@/components/ConceptChip";
 import { ReactionButtons } from "@/components/ReactionButtons";
-import { getProject } from "@/lib/projectStore";
+import { getProject, publishProject } from "@/lib/projectStore";
 import { getProjectById, resolveCreator } from "@/lib/mockData";
+import { useAuth } from "@/lib/auth";
+import { useToast } from "@/components/ui/Toast";
 import type { CollectorGameConfig, Project, QuizGameConfig, StoryGameConfig } from "@/lib/types";
 
 type Tab = "play" | "code" | "learn";
@@ -30,6 +32,39 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
   const [highlight, setHighlight] = useState<{ file: CodeFile; lines: number[] } | undefined>(undefined);
   const [remixOpen, setRemixOpen] = useState(false);
   const [tinkered, setTinkered] = useState<{ html?: string; css?: string; js?: string }>({});
+  const { account, isSignedIn, requireAuth } = useAuth();
+  const { show } = useToast();
+
+  function handlePublish() {
+    if (!project || project.published) return;
+    const doPublish = () => {
+      const updated = publishProject(project.id);
+      if (updated) {
+        setProject(updated);
+        show({
+          variant: "success",
+          title: "Nice one! It's live on Discover.",
+          body: "Other kids can now play and remix your project.",
+        });
+      }
+    };
+    if (!isSignedIn) {
+      requireAuth({ reason: "publish", onSuccess: doPublish });
+      return;
+    }
+    doPublish();
+  }
+
+  const canPublish =
+    project !== undefined &&
+    !project.published &&
+    (!isSignedIn || (account !== undefined && account.id === project.creatorId));
+  const showingPublishedPill =
+    project !== undefined &&
+    project.published &&
+    isSignedIn &&
+    account !== undefined &&
+    account.id === project.creatorId;
 
   useEffect(() => {
     const stored = getProject(projectId);
@@ -106,13 +141,30 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
               </p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setRemixOpen(true)}
-            className="bg-primary hover:bg-primary-hover text-white font-bold rounded-lg h-12 px-6 shadow-md transition-all"
-          >
-            🔁 Remix this
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            {canPublish ? (
+              <button
+                type="button"
+                onClick={handlePublish}
+                className="bg-surface text-text border-[1.5px] border-border-strong hover:border-primary hover:bg-primary-soft font-bold rounded-lg h-12 px-6 transition-all"
+              >
+                🚀 Publish to Discover
+              </button>
+            ) : null}
+            {showingPublishedPill ? (
+              <span className="inline-flex items-center gap-2 rounded-pill bg-success-soft text-success px-4 h-10 text-label font-semibold">
+                <span aria-hidden="true">✅</span>
+                On Discover
+              </span>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setRemixOpen(true)}
+              className="bg-primary hover:bg-primary-hover text-white font-bold rounded-lg h-12 px-6 shadow-md transition-all"
+            >
+              🔁 Remix this
+            </button>
+          </div>
         </div>
       </header>
 

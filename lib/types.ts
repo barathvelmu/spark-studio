@@ -82,6 +82,7 @@ export type Project = {
   remixCount: number;
   createdAt: string;
   gradient: GradientPreset;
+  published: boolean;
 };
 
 export type AskCodeAnswer = {

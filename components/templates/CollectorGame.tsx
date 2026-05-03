@@ -173,8 +173,16 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
           {config.player}
         </div>
 
-        <div
-          className="absolute select-none"
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (score >= WIN_SCORE) return;
+            setPlayer({ x: collectible.x, y: collectible.y });
+            setScore((s) => Math.min(s + 1, WIN_SCORE));
+            setCollectible(randomPosition());
+          }}
+          className="absolute select-none cursor-pointer hover:scale-110 transition-transform"
           style={{
             left: collectible.x,
             top: collectible.y,
@@ -182,11 +190,14 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
             lineHeight: `${EMOJI_SIZE}px`,
             width: EMOJI_SIZE,
             height: EMOJI_SIZE,
+            background: "transparent",
+            border: "none",
+            padding: 0,
           }}
-          aria-label="Collectible"
+          aria-label={`Collect ${config.collectible}`}
         >
           {config.collectible}
-        </div>
+        </button>
 
         {!isFocused && !hasWon && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

@@ -552,12 +552,13 @@ export function getIdeaById(id: string): Idea | undefined {
 }
 
 // Prewritten Q&A used as fallback for Ask the Code on the demo project.
-// Keys are normalized (lowercase, trimmed) question text.
+// Keys are normalized (lowercase, trimmed, trailing punctuation stripped)
+// to match the lookup in app/api/ask-code/route.ts.
 export const oceanCleanupAskAnswers: Record<
   string,
   { answer: string; relatedConcepts: string[]; suggestedNext: string[]; highlightJsLines?: number[] }
 > = {
-  "how does the score work?": {
+  "how does the score work": {
     answer:
       "The score starts at 0. Each time the turtle touches the plastic, the game adds 1 to score and updates the text on the screen.",
     relatedConcepts: ["variables", "conditionals"],
@@ -567,20 +568,20 @@ export const oceanCleanupAskAnswers: Record<
     ],
     highlightJsLines: [1, 26, 27],
   },
-  "where does the player move?": {
+  "where does the player move": {
     answer:
       "The player moves whenever you press an arrow key. The keydown event listener changes playerX or playerY by 10 pixels and then redraws the turtle in its new position.",
     relatedConcepts: ["events", "variables"],
     suggestedNext: ["How does the score work?", "How can I make it harder?"],
     highlightJsLines: [13, 14, 15, 16, 17, 18, 19, 20],
   },
-  "how can i make it harder?": {
+  "how can i make it harder": {
     answer:
       "Try moving the plastic faster, making the play area smaller, or only counting the score if the player collects 5 pieces in a row. You could also add a timer that ends the game after 30 seconds.",
     relatedConcepts: ["variables", "loops"],
     suggestedNext: ["How does the score work?", "Where does the player move?"],
   },
-  "what does this line do?": {
+  "what does this line do": {
     answer:
       "Tap any line in the code to highlight it, and I'll explain what it does in plain language. For example, line 1 (`let score = 0;`) creates a variable called score and starts it at zero.",
     relatedConcepts: ["variables"],

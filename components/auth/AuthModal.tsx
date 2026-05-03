@@ -172,6 +172,8 @@ export function AuthModal() {
         body: "Your account is ready.",
       });
     }
+    // Fire the deferred onSuccess (e.g. router.push to new build).
+    auth.firePendingSuccess();
     close(true);
   }
 

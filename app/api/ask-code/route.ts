@@ -60,11 +60,11 @@ export async function POST(req: Request) {
     codeJs: body.project?.codeJs ?? seed?.codeJs ?? "",
   };
 
-  // Fast-path: prewritten answers, but ONLY for the demo project. Other
-  // projects share question phrasing (e.g. "how does the score work?") but
-  // the answers would name the wrong player/collectible.
+  // Fast-path: prewritten answers, but ONLY for the Ocean Cleanup demo project.
+  // Other projects share question phrasing but the answers would name the wrong
+  // player/collectible. Strip trailing punctuation so "How does the score work?!" matches.
   if (resolved.id === "p_ocean") {
-    const key = question.toLowerCase();
+    const key = question.replace(/[?!.]+$/g, "").trim().toLowerCase();
     const exact = oceanCleanupAskAnswers[key];
     if (exact) {
       return NextResponse.json({

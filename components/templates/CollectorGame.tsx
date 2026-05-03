@@ -7,7 +7,7 @@ const PLAY_WIDTH = 600;
 const PLAY_HEIGHT = 360;
 const STEP = 16;
 const EMOJI_SIZE = 32;
-const COLLECT_RADIUS = 32;
+const COLLECT_RADIUS = 64; // generous so click-near-collectible reliably scores
 const WIN_SCORE = 10;
 
 const BACKGROUNDS: Record<CollectorGameConfig["background"], string> = {
@@ -67,11 +67,17 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
     }
   }, [player, collectible]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
+  // Global keyboard listener so the game works regardless of focus.
+  // The kid can just press arrow keys without clicking the play area first.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
       if (score >= WIN_SCORE) return;
       const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
       if (!keys.includes(e.key)) return;
+      // Only intercept arrows when not typing in an input/textarea.
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
       e.preventDefault();
       setPlayer((prev) => {
         let { x, y } = prev;
@@ -83,6 +89,34 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
         y = Math.max(0, Math.min(PLAY_HEIGHT - EMOJI_SIZE, y));
         return { x, y };
       });
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [score]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+      if (keys.includes(e.key)) e.preventDefault();
+    },
+    [],
+  );
+
+  // Click anywhere in the play area to move the player there.
+  // Works as the universal "play" gesture — no keyboard required.
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (score >= WIN_SCORE) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      // Map click position from on-screen pixels to logical play-area pixels
+      // (the play area scales down on small screens via aspectRatio).
+      const scaleX = PLAY_WIDTH / rect.width;
+      const scaleY = PLAY_HEIGHT / rect.height;
+      const localX = (e.clientX - rect.left) * scaleX;
+      const localY = (e.clientY - rect.top) * scaleY;
+      const targetX = Math.max(0, Math.min(PLAY_WIDTH - EMOJI_SIZE, localX - EMOJI_SIZE / 2));
+      const targetY = Math.max(0, Math.min(PLAY_HEIGHT - EMOJI_SIZE, localY - EMOJI_SIZE / 2));
+      setPlayer({ x: targetX, y: targetY });
     },
     [score],
   );
@@ -103,15 +137,19 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
   return (
     <div className="flex flex-col items-center gap-3 w-full">
       <p className="text-body-sm text-text-muted text-center">{config.goal}</p>
+      <p className="text-tiny text-text-muted text-center">
+        🖱️ Click anywhere in the play area to move · ⌨️ or use arrow keys
+      </p>
       <p className="font-display text-h3 text-text">Score: {score}</p>
 
       <div
         ref={playAreaRef}
         tabIndex={0}
         onKeyDown={handleKeyDown}
+        onClick={handleClick}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className="relative w-full max-w-[600px] rounded-xl overflow-hidden outline-none focus:ring-4 focus:ring-primary/40"
+        className="relative w-full max-w-[600px] rounded-xl overflow-hidden outline-none focus:ring-4 focus:ring-primary/40 cursor-pointer"
         style={{
           height: PLAY_HEIGHT,
           aspectRatio: `${PLAY_WIDTH} / ${PLAY_HEIGHT}`,
@@ -135,8 +173,16 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
           {config.player}
         </div>
 
-        <div
-          className="absolute select-none"
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (score >= WIN_SCORE) return;
+            setPlayer({ x: collectible.x, y: collectible.y });
+            setScore((s) => Math.min(s + 1, WIN_SCORE));
+            setCollectible(randomPosition());
+          }}
+          className="absolute select-none cursor-pointer hover:scale-110 transition-transform"
           style={{
             left: collectible.x,
             top: collectible.y,
@@ -144,11 +190,14 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
             lineHeight: `${EMOJI_SIZE}px`,
             width: EMOJI_SIZE,
             height: EMOJI_SIZE,
+            background: "transparent",
+            border: "none",
+            padding: 0,
           }}
-          aria-label="Collectible"
+          aria-label={`Collect ${config.collectible}`}
         >
           {config.collectible}
-        </div>
+        </button>
 
         {!isFocused && !hasWon && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

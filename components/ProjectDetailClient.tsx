@@ -6,6 +6,8 @@ import type { CodeFile } from "@/components/CodeView";
 import { CodeView } from "@/components/CodeView";
 import { CollectorGame } from "@/components/templates/CollectorGame";
 import { AskTheCodePanel } from "@/components/AskTheCodePanel";
+import { TinkerMode } from "@/components/TinkerMode";
+import type { TinkerFile } from "@/lib/tinker";
 import { RemixModal } from "@/components/RemixModal";
 import { SafetyBadge } from "@/components/SafetyBadge";
 import { LineageView } from "@/components/LineageView";
@@ -24,10 +26,15 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
   const [activeFile, setActiveFile] = useState<CodeFile>("js");
   const [highlight, setHighlight] = useState<{ file: CodeFile; lines: number[] } | undefined>(undefined);
   const [remixOpen, setRemixOpen] = useState(false);
+  const [tinkered, setTinkered] = useState<{ html?: string; css?: string; js?: string }>({});
 
   useEffect(() => {
     const stored = getProject(projectId);
     if (stored) setProject(stored);
+  }, [projectId]);
+
+  useEffect(() => {
+    setTinkered({});
   }, [projectId]);
 
   if (!project) {
@@ -49,6 +56,25 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
   }
 
   const creator = getUserById(project.creatorId);
+
+  const effectiveProject: Project = {
+    ...project,
+    codeHtml: tinkered.html ?? project.codeHtml,
+    codeCss: tinkered.css ?? project.codeCss,
+    codeJs: tinkered.js ?? project.codeJs,
+  };
+
+  function applyEdit(file: TinkerFile, before: string, after: string) {
+    const current =
+      file === "js"
+        ? effectiveProject.codeJs
+        : file === "css"
+        ? effectiveProject.codeCss
+        : effectiveProject.codeHtml;
+    if (!current.includes(before)) return;
+    const next = current.replace(before, after);
+    setTinkered((prev) => ({ ...prev, [file]: next }));
+  }
 
   return (
     <div className="max-w-page mx-auto px-7 lg:px-9 py-11">
@@ -101,17 +127,18 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
         })}
       </div>
 
-      {tab === "play" && <PlayTab project={project} />}
+      {tab === "play" && <PlayTab project={effectiveProject} />}
       {tab === "code" && (
         <CodeTab
-          project={project}
+          project={effectiveProject}
           activeFile={activeFile}
           onActiveFile={setActiveFile}
           highlight={highlight}
           onHighlight={setHighlight}
+          applyEdit={applyEdit}
         />
       )}
-      {tab === "learn" && <LearnTab project={project} />}
+      {tab === "learn" && <LearnTab project={effectiveProject} />}
 
       <RemixModal parent={project} open={remixOpen} onClose={() => setRemixOpen(false)} />
     </div>
@@ -140,25 +167,37 @@ function CodeTab({
   onActiveFile,
   highlight,
   onHighlight,
+  applyEdit,
 }: {
   project: Project;
   activeFile: CodeFile;
   onActiveFile: (f: CodeFile) => void;
   highlight: { file: CodeFile; lines: number[] } | undefined;
   onHighlight: (h: { file: CodeFile; lines: number[] }) => void;
+  applyEdit: (file: TinkerFile, before: string, after: string) => void;
 }) {
   return (
     <div className="grid lg:grid-cols-[1fr_400px] gap-6">
-      <div className="bg-surface rounded-xl shadow-md p-6">
-        <CodeView
-          codeHtml={project.codeHtml}
-          codeCss={project.codeCss}
-          codeJs={project.codeJs}
-          activeFile={activeFile}
-          onActiveFileChange={onActiveFile}
-          highlightLines={highlight}
-          onAskAboutLine={(file, line) => {
-            onHighlight({ file, lines: [line] });
+      <div className="space-y-6">
+        <div className="bg-surface rounded-xl shadow-md p-6">
+          <CodeView
+            codeHtml={project.codeHtml}
+            codeCss={project.codeCss}
+            codeJs={project.codeJs}
+            activeFile={activeFile}
+            onActiveFileChange={onActiveFile}
+            highlightLines={highlight}
+            onAskAboutLine={(file, line) => {
+              onHighlight({ file, lines: [line] });
+            }}
+          />
+        </div>
+        <TinkerMode
+          project={project}
+          applyEdit={applyEdit}
+          onLookHere={(file, lines) => {
+            onActiveFile(file);
+            onHighlight({ file, lines });
           }}
         />
       </div>

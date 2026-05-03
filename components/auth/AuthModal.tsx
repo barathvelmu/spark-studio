@@ -422,8 +422,8 @@ function ProfileStep({ onConfirm }: { onConfirm: () => void }) {
       </div>
 
       <label className="block text-body-sm font-semibold text-text mb-2">Avatar</label>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {AVATAR_OPTIONS.map((emoji) => {
+      <div className="flex flex-wrap gap-1.5 mb-6 max-h-[180px] overflow-y-auto">
+        {AVATAR_OPTIONS.slice(0, 18).map((emoji) => {
           const active = emoji === account.emoji;
           return (
             <button
@@ -431,7 +431,7 @@ function ProfileStep({ onConfirm }: { onConfirm: () => void }) {
               type="button"
               onClick={() => auth.setAvatar(emoji)}
               className={[
-                "w-11 h-11 rounded-pill text-2xl inline-flex items-center justify-center transition-all",
+                "w-9 h-9 rounded-pill text-lg inline-flex items-center justify-center transition-all",
                 active
                   ? "bg-primary-soft ring-2 ring-primary scale-105"
                   : "bg-surface-muted hover:bg-primary-soft",

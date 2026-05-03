@@ -19,6 +19,13 @@ export type User = {
   id: string;
   handle: string;
   emoji: string;
+  email?: string;
+  createdAt?: string;
+};
+
+export type Account = User & {
+  email: string;
+  createdAt: string;
 };
 
 export type Idea = {

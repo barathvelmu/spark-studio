@@ -28,7 +28,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[rgba(250,250,255,0.85)] backdrop-blur-md border-b border-border">
+    <header className="sticky top-0 z-40 w-full bg-[rgba(250,249,245,0.85)] backdrop-blur-md border-b border-border">
       <div className="max-w-page mx-auto flex items-center justify-between h-16 px-7 lg:px-9">
         <Link
           href="/"

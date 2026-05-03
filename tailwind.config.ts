@@ -63,11 +63,11 @@ const config: Config = {
         pill: "999px",
       },
       boxShadow: {
-        sm: "0 2px 4px rgba(30, 27, 75, 0.06)",
-        md: "0 6px 16px rgba(30, 27, 75, 0.08), 0 2px 4px rgba(30, 27, 75, 0.04)",
-        lg: "0 16px 32px rgba(30, 27, 75, 0.10), 0 4px 8px rgba(30, 27, 75, 0.06)",
-        xl: "0 24px 48px rgba(30, 27, 75, 0.14), 0 8px 16px rgba(30, 27, 75, 0.08)",
-        press: "0 1px 0 rgba(30, 27, 75, 0.10)",
+        sm: "0 2px 4px rgba(44, 24, 16, 0.06)",
+        md: "0 6px 16px rgba(44, 24, 16, 0.08), 0 2px 4px rgba(44, 24, 16, 0.04)",
+        lg: "0 16px 32px rgba(44, 24, 16, 0.10), 0 4px 8px rgba(44, 24, 16, 0.06)",
+        xl: "0 24px 48px rgba(44, 24, 16, 0.14), 0 8px 16px rgba(44, 24, 16, 0.08)",
+        press: "0 1px 0 rgba(44, 24, 16, 0.10)",
       },
       fontFamily: {
         display: ["var(--font-nunito)", "system-ui", "sans-serif"],

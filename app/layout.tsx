@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Nunito, Inter, JetBrains_Mono } from "next/font/google";
+import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { ToastProvider } from "@/components/ui/Toast";
 
-const nunito = Nunito({
+const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["600", "700", "800"],
   variable: "--font-nunito",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${nunito.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
         <ToastProvider>
           <Header />

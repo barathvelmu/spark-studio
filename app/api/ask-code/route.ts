@@ -38,9 +38,11 @@ export async function POST(req: Request) {
   const question = (body.question ?? "").trim();
   const project = body.projectId ? getProjectById(body.projectId) : undefined;
 
-  // Fast-path: prewritten answer for the demo project's known questions.
-  const key = question.toLowerCase();
-  const exact = oceanCleanupAskAnswers[key];
+  // Fast-path: prewritten answer for the Ocean Cleanup demo project's known questions.
+  // Only applied when the user is actually viewing Ocean Cleanup — otherwise these
+  // answers reference turtles/plastic that don't exist in other projects.
+  const key = question.replace(/[?!.]+$/g, "").trim().toLowerCase();
+  const exact = body.projectId === "p_ocean" ? oceanCleanupAskAnswers[key] : undefined;
   if (exact) {
     return NextResponse.json({
       answer: exact.answer,

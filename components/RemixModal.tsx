@@ -16,6 +16,15 @@ type RemixModalProps = {
   onClose: () => void;
 };
 
+const REMIX_PRESETS: Array<{ label: string; seed: string }> = [
+  { label: "Change theme", seed: "Change the theme to something completely different" },
+  { label: "Add timer", seed: "Add a timer that ends the game after 30 seconds" },
+  { label: "Make it harder", seed: "Make it harder by adding more obstacles or fewer chances" },
+  { label: "Change character", seed: "Change the main character to something unexpected" },
+  { label: "Add levels", seed: "Add a level-up when the score reaches 10" },
+  { label: "Different setting", seed: "Move the action to a different setting or background" },
+];
+
 export function RemixModal({ parent, open, onClose }: RemixModalProps) {
   const router = useRouter();
   const { account, isSignedIn, requireAuth } = useAuth();
@@ -83,6 +92,20 @@ export function RemixModal({ parent, open, onClose }: RemixModalProps) {
       <p className="text-body-sm text-text-muted mb-4">
         Forking from <strong className="text-text">{parent.title}</strong>
       </p>
+      <p className="text-body-sm font-semibold text-text mb-2">Try a quick remix:</p>
+      <div className="flex flex-wrap gap-2 mb-5">
+        {REMIX_PRESETS.map((preset) => (
+          <button
+            key={preset.label}
+            type="button"
+            onClick={() => setPrompt(preset.seed)}
+            disabled={busy}
+            className="rounded-pill bg-surface-muted hover:bg-primary-soft text-text-muted hover:text-primary text-tiny font-semibold px-4 h-8 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
       <Textarea
         label="What do you want to change?"
         value={prompt}

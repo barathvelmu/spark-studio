@@ -1,4 +1,4 @@
-# Spark Studio
+# Spark Studio 🌟
 
 **A remix-first AI coding playground for kids.** Describe an idea, watch it become a playable mini-project, inspect the real code behind it, ask questions about how it works, remix it into something new, and learn the coding concepts behind every AI-assisted change.
 
@@ -119,7 +119,7 @@ scripts/
 
 ## Status
 
-Built in ~4 hours of hacking time (Stata 32-141, May 3, 2026, 1–5pm) for Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackathon. The theme — adapted from Dario Amodei's [essay](https://www.darioamodei.com/essay/machines-of-loving-grace) of the same name — challenged teams to build something that moves the needle toward a more humane world. Spark Studio's wedge: getting kids who don't have access to advanced CS classes, mentors, or expensive tools to participate as **creators** of AI-assisted software, not just consumers — and learning the underlying concepts as they go.
+Built for Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackathon. The theme — adapted from Dario Amodei's [essay](https://www.darioamodei.com/essay/machines-of-loving-grace) of the same name — challenged teams to build something that moves the needle toward a more humane world. Spark Studio's wedge: getting kids who don't have access to advanced CS classes, mentors, or expensive tools to participate as **creators** of AI-assisted software, not just consumers — and learning the underlying concepts as they go.
 
 There's also a quiet bit of MIT lineage threaded through the project: Scratch was born at the MIT Media Lab's Lifelong Kindergarten group, and Spark Studio is consciously the "what would Scratch look like for the AI-native generation" question, asked at the place where Scratch began.
 
@@ -131,7 +131,7 @@ Architectural cuts that would be the next features in a hosted version: real DB 
 
 Built by [@barathvelmu](https://github.com/barathvelmu) and [@AshritVerma](https://github.com/AshritVerma).
 
-**Hackathon:** Claude Builders @ MIT — *Machines of Loving Grace* Spring Sprint Hackathon, May 3, 2026, Stata 32-141.
+**Hackathon:** Claude Builders @ MIT — *Machines of Loving Grace* Spring Sprint Hackathon, May 3, 2026.
 
 **Sponsors:** Presenting — [Anthropic](https://www.anthropic.com). Supporting — [Jane Street](https://www.janestreet.com) and [HRT](https://www.hudsonrivertrading.com).
 

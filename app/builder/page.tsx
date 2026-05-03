@@ -60,23 +60,31 @@ function BuilderInner() {
     setIsBuilding(true);
     const resolvedType: ProjectType | "auto" = type;
     let draft: ProjectDraft | undefined;
-    try {
-      const res = await fetch("/api/generate-project", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: currentPrompt,
-          projectType: resolvedType,
-          ideaId: idea?.id,
-          creatorId,
-        }),
-      });
-      if (res.ok) {
-        draft = (await res.json()) as ProjectDraft;
-      }
-    } catch {
-      // fall through to template fallback below
-    }
+
+    const [fetchResult] = await Promise.all([
+      (async () => {
+        try {
+          const res = await fetch("/api/generate-project", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: currentPrompt,
+              projectType: resolvedType,
+              ideaId: idea?.id,
+              creatorId,
+            }),
+          });
+          if (res.ok) return (await res.json()) as ProjectDraft;
+        } catch {
+          // fall through
+        }
+        return undefined;
+      })(),
+      // Always show the building animation for at least 1.5s so it feels like something happened.
+      new Promise<void>((resolve) => setTimeout(resolve, 1500)),
+    ]);
+
+    draft = fetchResult;
 
     if (!draft) {
       // Offline / API failure — fall back to the deterministic template so

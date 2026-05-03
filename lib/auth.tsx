@@ -72,6 +72,9 @@ type AuthContextValue = {
     code: string,
     opts?: { handle?: string; emoji?: string }
   ) => VerifyAndContinueResult;
+  // For new accounts, AuthModal calls this after the profile-confirm step
+  // to fire the deferred onSuccess callback (e.g. router.push the new build).
+  firePendingSuccess: () => void;
   // post-signin
   signOut: () => void;
   regenerateHandle: () => Account | undefined;
@@ -182,13 +185,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccount(created);
       // Migrate any legacy anonymous local data into this new account.
       migrateAnonymousData(created.id);
-      const cb = onSuccessRef.current;
-      onSuccessRef.current = undefined;
-      cb?.(created);
+      // For NEW accounts we defer the onSuccess callback until the user
+      // confirms the profile step in AuthModal — otherwise navigation fires
+      // (e.g. router.push to the new project) and the profile modal floats
+      // over the next page. AuthModal calls firePendingSuccess() on confirm.
       return { ok: true, account: created, isNew: true };
     },
     [proposedProfile]
   );
+
+  const firePendingSuccess = useCallback(() => {
+    const cb = onSuccessRef.current;
+    onSuccessRef.current = undefined;
+    if (account && cb) cb(account);
+  }, [account]);
 
   const signOut = useCallback(() => {
     clearSession();
@@ -241,6 +251,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProposedAvatar,
       requestCode,
       verifyAndContinue,
+      firePendingSuccess,
       signOut,
       regenerateHandle,
       setAvatar,
@@ -258,6 +269,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProposedAvatar,
       requestCode,
       verifyAndContinue,
+      firePendingSuccess,
       signOut,
       regenerateHandle,
       setAvatar,

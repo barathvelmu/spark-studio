@@ -31,3 +31,4 @@ pnpm-debug.log*
 
 # Local-only progress tracker (per-collaborator; not shared)
 checklist.md
+test-results/

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Nunito, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -34,8 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${nunito.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
-        <Header />
-        <main>{children}</main>
+        <ToastProvider>
+          <Header />
+          <main>{children}</main>
+        </ToastProvider>
       </body>
     </html>
   );

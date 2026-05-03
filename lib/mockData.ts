@@ -243,6 +243,112 @@ function showFinalScore() {
 showQuestion();
 `;
 
+// Hand-written, kid-friendly Kindness Quest code.
+const kindnessQuestHtml = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kindness Quest</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Kindness Quest</h1>
+    <div id="story-text">Story goes here</div>
+    <div id="choices"></div>
+    <div id="story-end" style="display: none;">
+      <p>🌟 The End</p>
+      <button id="restart">Start Over</button>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
+`;
+
+const kindnessQuestCss = `/* The page background is a soft mint green */
+body {
+  background: #ECFDF5;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+/* The story text looks big and friendly */
+#story-text {
+  font-size: 22px;
+  margin: 20px;
+  color: #064E3B;
+}
+
+/* Each choice is a tappable button */
+.choice {
+  display: block;
+  width: 300px;
+  margin: 8px auto;
+  padding: 12px;
+  background: #A7F3D0;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+`;
+
+const kindnessQuestJs = `// All the scenes in our story
+const scenes = [
+  {
+    id: "start",
+    text: "Your friend looks sad at lunch. What do you do?",
+    choices: [
+      { label: "Sit with them", nextId: "good" },
+      { label: "Keep walking", nextId: "neutral" }
+    ]
+  },
+  { id: "good", text: "They smile. You made their day.", choices: [] },
+  { id: "neutral", text: "Lunch ends. You wonder how they felt.", choices: [] }
+];
+
+// Keep track of which scene we are on right now
+let currentSceneId = "start";
+
+// Find the things on the page we want to control
+const storyText = document.getElementById("story-text");
+const choicesBox = document.getElementById("choices");
+const storyEnd = document.getElementById("story-end");
+
+// Show the current scene and its choices on the page
+function showScene() {
+  const scene = scenes.find((s) => s.id === currentSceneId);
+  storyText.innerText = scene.text;
+  choicesBox.innerHTML = "";
+  if (scene.choices.length === 0) {
+    storyEnd.style.display = "block";
+    return;
+  }
+  storyEnd.style.display = "none";
+  for (let i = 0; i < scene.choices.length; i++) {
+    const button = document.createElement("button");
+    button.innerText = scene.choices[i].label;
+    button.className = "choice";
+    button.addEventListener("click", () => handleChoice(scene.choices[i].nextId));
+    choicesBox.appendChild(button);
+  }
+}
+
+// When the player picks a choice, move to the next scene
+function handleChoice(nextId) {
+  currentSceneId = nextId;
+  showScene();
+}
+
+// When the player clicks Start Over, go back to the beginning
+document.getElementById("restart").addEventListener("click", () => {
+  currentSceneId = "start";
+  showScene();
+});
+
+// Start the story on the very first scene
+showScene();
+`;
+
 // Space Junk variant: same code, swapped player + collectible.
 const spaceJunkHtml = oceanCleanupHtml
   .replace("Ocean Cleanup Game", "Space Junk Rescue")
@@ -382,9 +488,9 @@ export const projects: Project[] = [
     },
     tags: ["Story", "Social Good"],
     concepts: ["branching", "state"],
-    codeHtml: "",
-    codeCss: "",
-    codeJs: "",
+    codeHtml: kindnessQuestHtml,
+    codeCss: kindnessQuestCss,
+    codeJs: kindnessQuestJs,
     learningSummary:
       "This story uses branching logic and state to remember what choices you made.",
     changeSummary: ["Created an opening scene", "Added two choices", "Added two endings"],

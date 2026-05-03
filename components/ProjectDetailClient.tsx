@@ -13,6 +13,7 @@ import type { TinkerFile } from "@/lib/tinker";
 import { RemixModal } from "@/components/RemixModal";
 import { SafetyBadge } from "@/components/SafetyBadge";
 import { LineageView } from "@/components/LineageView";
+import { LineageTree } from "@/components/LineageTree";
 import { ConceptChip } from "@/components/ConceptChip";
 import { ReactionButtons } from "@/components/ReactionButtons";
 import { getProject } from "@/lib/projectStore";
@@ -114,6 +115,8 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
           </button>
         </div>
       </header>
+
+      <LineageTree projectId={project.id} />
 
       {/* Tabs */}
       <div className="bg-surface-muted rounded-pill p-1 inline-flex mb-6">

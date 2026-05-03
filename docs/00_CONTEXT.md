@@ -1,5 +1,7 @@
 # 00_CONTEXT.md — Product Context
 
+> **Pre-build planning artifact.** Written before the hackathon clock started; preserved as part of the project history. For what actually shipped, see [`README.md`](../README.md). For architecture, see [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
 ## What We Are Building
 **Spark Studio** is a remix-first AI coding playground for kids.
 

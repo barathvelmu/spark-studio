@@ -1,5 +1,7 @@
 # 01_PRODUCT_SPEC.md — Product Specification
 
+> **Pre-build planning artifact.** The spec we wrote before the build started. Some MVP items below were cut, several stretch items shipped. For what actually shipped, see [`README.md`](../README.md).
+
 ## One-Liner
 Spark Studio helps young creators turn ideas into playable mini-projects, inspect the code, ask questions, remix other projects, and learn the coding concepts behind every AI-assisted change.
 

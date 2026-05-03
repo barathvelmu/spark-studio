@@ -1,5 +1,7 @@
 # 04_AI_AND_API.md — AI/API Plan
 
+> **Pre-build planning artifact.** The AI strategy and route shapes we drafted before writing any code. The actual implementation is in [`lib/anthropic.ts`](../lib/anthropic.ts) and [`app/api/`](../app/api). The Tinker Mode endpoint described below shipped as `app/api/tinker/route.ts`. See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for how it all fits together.
+
 ## API Credit Strategy
 $25 of API credits is enough for a hackathon prototype if calls are constrained.
 

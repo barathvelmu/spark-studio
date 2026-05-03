@@ -1,5 +1,7 @@
 # AGENTS.md — Coding Agent Guide for Spark Studio
 
+> **Pre-build agent operating instructions.** This file told the coding agents (Claude Code, subagents) how to think about the project before any code was written. Preserved as a historical artifact of how the build was orchestrated. For what actually shipped, see [`README.md`](./README.md).
+
 ## Mission
 Build Spark Studio: a kid-safe, AI-native creative coding playground inspired by Scratch and remix/fork culture.
 

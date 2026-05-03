@@ -1,5 +1,7 @@
 # 02_BUILD_PLAN.md — Build Plan
 
+> **Pre-build planning artifact.** The execution plan we wrote during scoping; the locked decisions section near the top is what we actually held to. For the final architecture, see [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
 ## Principle
 Build the polished demo path first. Add sophistication only after the core loop works.
 

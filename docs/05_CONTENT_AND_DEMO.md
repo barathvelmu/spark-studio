@@ -1,5 +1,7 @@
 # 05_CONTENT_AND_DEMO.md — Content, Demo, and Pitch
 
+> **Pre-build planning artifact** — the seed content and pitch language we drafted before the build. The seed users and projects below shipped exactly as described in [`lib/mockData.ts`](../lib/mockData.ts). For the final demo flow, see [`06_DEMO_SCRIPT.md`](./06_DEMO_SCRIPT.md).
+
 ## Preloaded Users
 - Maya
 - Alex

@@ -27,3 +27,6 @@ pnpm-debug.log*
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Local-only progress tracker (per-collaborator; not shared)
+checklist.md

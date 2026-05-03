@@ -62,6 +62,12 @@ export async function POST(req: Request) {
 
   let draft: ProjectDraft;
 
+  // Quiz and story types have their own template paths — skip Claude's collector shape.
+  if (projectType === "quiz_game" || projectType === "story") {
+    draft = generateProjectDraft({ prompt, projectType, creatorId, originalIdeaId: body.ideaId });
+    return NextResponse.json(draft);
+  }
+
   if (isAnthropicConfigured() && prompt.trim().length > 0) {
     const ai = await askClaudeJson<ClaudeShape>({
       systemHint: SYSTEM_HINT,

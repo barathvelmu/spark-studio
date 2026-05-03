@@ -103,9 +103,10 @@ export function QuizGame({ config }: { config: QuizGameConfig }) {
         />
       </div>
 
-      <p className="text-tiny font-semibold text-text-muted uppercase tracking-wide mb-2">
+      <p className="text-tiny font-semibold text-text-muted uppercase tracking-wide mb-1">
         Question {currentIndex + 1} of {total}
       </p>
+      <p className="text-tiny text-text-muted mb-3">🖱️ Click an answer below</p>
       <h2 className="font-display text-h3 mb-5">{question.q}</h2>
 
       <div className="space-y-3">

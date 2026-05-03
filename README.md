@@ -120,7 +120,9 @@ scripts/
 
 ## Status
 
-We built this in about 4 hours of hacking time on May 3, 2026, in Stata 32-141, for Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackathon. The theme came from Dario Amodei's [essay](https://www.darioamodei.com/essay/machines-of-loving-grace) of the same name, which challenged teams to build something that moves the needle toward a more humane world. Our angle: getting kids who don't have access to advanced CS classes, mentors, or expensive tools to participate as creators of AI-assisted software, not just consumers, and to actually learn the underlying concepts as they go.
+We built this in the 2-hour hack window (1–3 PM, Stata 32-141, May 3, 2026) for Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackathon. The schedule was tight: opening ceremony and track reveal at 12:30, hack from 1 to 3, demo videos due at 3 for judging. The theme came from Dario Amodei's [essay](https://www.darioamodei.com/essay/machines-of-loving-grace) of the same name, which challenged teams to build something that moves the needle toward a more humane world. Our angle: getting kids who don't have access to advanced CS classes, mentors, or expensive tools to participate as creators of AI-assisted software, not just consumers, and to actually learn the underlying concepts as they go.
+
+Two hours is the reason a lot of the architecture looks the way it does. Template-based generation instead of free-form code generation. Hand-written code strings instead of AI-generated source. Mock fallbacks on every Claude route so a network blip can't break the demo. Pre-build planning documents (the `docs/00`–`05` files) written before kickoff so the team could split work the moment the clock started. Two hours forces good decisions.
 
 There's a small bit of MIT lineage threaded through the project too. Scratch was born at the MIT Media Lab's Lifelong Kindergarten group, so asking "what would Scratch look like for the AI-native generation?" feels right when the question is asked at the place where Scratch began.
 

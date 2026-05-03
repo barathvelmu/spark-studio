@@ -139,6 +139,110 @@ function checkCollision() {
 }
 `;
 
+// Hand-written, kid-friendly Climate Quiz code.
+const climateQuizHtml = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Climate Quiz Challenge</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Climate Quiz Challenge</h1>
+    <div id="score">Score: 0</div>
+    <div id="question">Question goes here</div>
+    <div id="choices"></div>
+    <button id="next">Next →</button>
+    <script src="game.js"></script>
+  </body>
+</html>
+`;
+
+const climateQuizCss = `/* The page background is a soft mint */
+body {
+  background: #ECFDF5;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 20px;
+}
+
+/* The question and score look big and friendly */
+#question {
+  font-size: 22px;
+  margin: 20px;
+}
+
+/* Each answer choice is a tappable button */
+.choice {
+  display: block;
+  width: 300px;
+  margin: 8px auto;
+  padding: 12px;
+  background: #F1F5F9;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+}
+`;
+
+const climateQuizJs = `// All the questions in our quiz
+const questions = [
+  { q: "Which gas traps the most heat?", choices: ["Oxygen", "Carbon dioxide", "Helium"], answerIndex: 1 },
+  { q: "What helps reduce ocean plastic?", choices: ["Recycling", "Littering", "Burning trash"], answerIndex: 0 }
+];
+
+// Keep track of the score and which question we're on
+let score = 0;
+let currentQuestion = 0;
+
+// Find the things on the page we want to control
+const questionText = document.getElementById("question");
+const choicesBox = document.getElementById("choices");
+const scoreText = document.getElementById("score");
+const nextButton = document.getElementById("next");
+
+// Show the current question and its choices on the page
+function showQuestion() {
+  const q = questions[currentQuestion];
+  questionText.innerText = q.q;
+  choicesBox.innerHTML = "";
+  for (let i = 0; i < q.choices.length; i++) {
+    const button = document.createElement("button");
+    button.innerText = q.choices[i];
+    button.className = "choice";
+    button.addEventListener("click", () => handleChoice(i));
+    choicesBox.appendChild(button);
+  }
+}
+
+// When the player clicks a choice, check if it's right
+function handleChoice(index) {
+  if (index === questions[currentQuestion].answerIndex) {
+    score = score + 1;
+    scoreText.innerText = "Score: " + score;
+  }
+}
+
+// When the player clicks Next, go to the next question or the end
+nextButton.addEventListener("click", () => {
+  currentQuestion = currentQuestion + 1;
+  if (currentQuestion >= questions.length) {
+    showFinalScore();
+  } else {
+    showQuestion();
+  }
+});
+
+// Show the final score when the quiz is over
+function showFinalScore() {
+  questionText.innerText = "🎉 You scored " + score + " of " + questions.length;
+  choicesBox.innerHTML = "";
+}
+
+// Start the quiz on the very first question
+showQuestion();
+`;
+
 // Space Junk variant: same code, swapped player + collectible.
 const spaceJunkHtml = oceanCleanupHtml
   .replace("Ocean Cleanup Game", "Space Junk Rescue")
@@ -243,9 +347,9 @@ export const projects: Project[] = [
     },
     tags: ["Quiz", "Climate"],
     concepts: ["arrays", "conditionals", "score"],
-    codeHtml: "",
-    codeCss: "",
-    codeJs: "",
+    codeHtml: climateQuizHtml,
+    codeCss: climateQuizCss,
+    codeJs: climateQuizJs,
     learningSummary:
       "This quiz uses an array of questions, a score variable, and conditionals to check answers.",
     changeSummary: ["Created a climate quiz", "Added 2 questions", "Added a score"],

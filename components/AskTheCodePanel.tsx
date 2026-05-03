@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { oceanCleanupAskAnswers, suggestedAskQuestions } from "@/lib/mockData";
+import { suggestedAskQuestions } from "@/lib/mockData";
 import type { Project } from "@/lib/types";
 
 type Message = { role: "user" | "assistant"; text: string };
@@ -11,31 +11,25 @@ type AskTheCodePanelProps = {
   onLookHere?: (file: "html" | "css" | "js", lines: number[]) => void;
 };
 
-function answerFor(question: string): { text: string; suggestedNext: string[]; highlightJsLines?: number[] } {
-  const key = question.trim().toLowerCase();
-  const exact = oceanCleanupAskAnswers[key];
-  if (exact) {
-    return { text: exact.answer, suggestedNext: exact.suggestedNext, highlightJsLines: exact.highlightJsLines };
-  }
-  // Fuzzy: try to find a key whose words are mostly contained in the question
-  for (const [k, v] of Object.entries(oceanCleanupAskAnswers)) {
-    const words = k.replace(/[?]/g, "").split(/\s+/).filter((w) => w.length > 3);
-    const hits = words.filter((w) => key.includes(w)).length;
-    if (hits >= Math.max(2, Math.floor(words.length / 2))) {
-      return { text: v.answer, suggestedNext: v.suggestedNext, highlightJsLines: v.highlightJsLines };
-    }
-  }
-  return {
-    text:
-      "I only know about this project's code so far. Try one of the suggested questions below — or click any line in the code and I'll explain it.",
-    suggestedNext: suggestedAskQuestions,
-  };
-}
+type AskResponse = {
+  answer: string;
+  relatedConcepts?: string[];
+  suggestedNextQuestions?: string[];
+  highlightLines?: { file: "html" | "css" | "js"; lines: number[] };
+};
 
 export function AskTheCodePanel({ project, onLookHere }: AskTheCodePanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [suggested, setSuggested] = useState<string[]>(suggestedAskQuestions);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Reset chat + suggestions when switching projects.
+    setMessages([]);
+    setSuggested(suggestedAskQuestions);
+  }, [project.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -43,18 +37,51 @@ export function AskTheCodePanel({ project, onLookHere }: AskTheCodePanelProps) {
     }
   }, [messages]);
 
-  function ask(question: string) {
+  async function ask(question: string) {
     const trimmed = question.trim();
-    if (!trimmed) return;
-    const { text, highlightJsLines } = answerFor(trimmed);
-    setMessages((m) => [
-      ...m,
-      { role: "user", text: trimmed },
-      { role: "assistant", text },
-    ]);
+    if (!trimmed || busy) return;
+    setBusy(true);
     setInput("");
-    if (highlightJsLines && onLookHere) {
-      onLookHere("js", highlightJsLines);
+    setMessages((m) => [...m, { role: "user", text: trimmed }]);
+
+    try {
+      const res = await fetch("/api/ask-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: project.id,
+          question: trimmed,
+          // Snapshot so the server sees the latest code (including Tinker
+          // edits) even for projects that only exist in localStorage.
+          project: {
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            codeHtml: project.codeHtml,
+            codeCss: project.codeCss,
+            codeJs: project.codeJs,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error(`ask-code ${res.status}`);
+      const data = (await res.json()) as AskResponse;
+      setMessages((m) => [...m, { role: "assistant", text: data.answer }]);
+      if (Array.isArray(data.suggestedNextQuestions) && data.suggestedNextQuestions.length > 0) {
+        setSuggested(data.suggestedNextQuestions.slice(0, 3));
+      }
+      if (data.highlightLines && onLookHere) {
+        onLookHere(data.highlightLines.file, data.highlightLines.lines);
+      }
+    } catch {
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          text: "Something went wrong. Try again, or pick a suggested question below.",
+        },
+      ]);
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -88,16 +115,26 @@ export function AskTheCodePanel({ project, onLookHere }: AskTheCodePanelProps) {
             </div>
           </div>
         ))}
+        {busy && (
+          <div className="flex justify-start">
+            <div className="bg-surface text-text-muted rounded-xl rounded-bl-sm shadow-sm px-4 py-3 text-body-sm inline-flex gap-1 items-center">
+              <span className="w-2 h-2 rounded-pill bg-text-subtle animate-bounce" style={{ animationDelay: "0ms" }} />
+              <span className="w-2 h-2 rounded-pill bg-text-subtle animate-bounce" style={{ animationDelay: "120ms" }} />
+              <span className="w-2 h-2 rounded-pill bg-text-subtle animate-bounce" style={{ animationDelay: "240ms" }} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Suggested chips */}
       <div className="flex flex-wrap gap-2 mt-4 mb-3">
-        {suggestedAskQuestions.map((q) => (
+        {suggested.map((q) => (
           <button
             key={q}
             type="button"
             onClick={() => ask(q)}
-            className="rounded-pill bg-surface text-text-muted hover:text-text text-tiny font-semibold px-4 h-8 shadow-sm transition-colors"
+            disabled={busy}
+            className="rounded-pill bg-surface text-text-muted hover:text-text text-tiny font-semibold px-4 h-8 shadow-sm transition-colors disabled:opacity-60"
           >
             {q}
           </button>
@@ -116,14 +153,15 @@ export function AskTheCodePanel({ project, onLookHere }: AskTheCodePanelProps) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={`Ask about ${project.title}…`}
+          disabled={busy}
           className="flex-1 bg-surface rounded-md p-3 text-body-sm focus:outline-none border-[1.5px] border-transparent focus:border-primary transition-colors"
         />
         <button
           type="submit"
-          disabled={!input.trim()}
+          disabled={!input.trim() || busy}
           className="bg-primary hover:bg-primary-hover text-white font-bold rounded-lg h-11 px-5 text-label disabled:bg-text-subtle transition-colors"
         >
-          Ask
+          {busy ? "…" : "Ask"}
         </button>
       </form>
     </aside>

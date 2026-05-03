@@ -99,6 +99,7 @@ export async function POST(req: Request) {
         nextChallenge: ai.nextChallenge || "Try adding a timer.",
         safetyStatus: "checked",
         gradient: ai.gradient || "sky",
+        published: false,
       };
     } else {
       draft = generateProjectDraft({ prompt, projectType, creatorId, originalIdeaId: body.ideaId });

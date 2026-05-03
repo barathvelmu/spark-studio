@@ -8,7 +8,9 @@ import { createProject } from "@/lib/projectStore";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
 import { useAuth } from "@/lib/auth";
-import type { ProjectType } from "@/lib/types";
+import type { Project, ProjectType } from "@/lib/types";
+
+type ProjectDraft = Omit<Project, "id" | "createdAt" | "remixCount">;
 
 type SelectableType = "auto" | "collector_game" | "quiz_game" | "story";
 
@@ -54,19 +56,42 @@ function BuilderInner() {
   const [isBuilding, setIsBuilding] = useState(false);
   const autoBuildRef = useRef(false);
 
-  function buildWithCreator(creatorId: string, currentPrompt: string, type: SelectableType) {
+  async function buildWithCreator(creatorId: string, currentPrompt: string, type: SelectableType) {
     setIsBuilding(true);
     const resolvedType: ProjectType | "auto" = type;
-    setTimeout(() => {
-      const draft = generateProjectDraft({
+    let draft: ProjectDraft | undefined;
+    try {
+      const res = await fetch("/api/generate-project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: currentPrompt,
+          projectType: resolvedType,
+          ideaId: idea?.id,
+          creatorId,
+        }),
+      });
+      if (res.ok) {
+        draft = (await res.json()) as ProjectDraft;
+      }
+    } catch {
+      // fall through to template fallback below
+    }
+
+    if (!draft) {
+      // Offline / API failure — fall back to the deterministic template so
+      // the demo keeps working without a server round-trip.
+      draft = generateProjectDraft({
         prompt: currentPrompt,
         projectType: resolvedType,
         creatorId,
         originalIdeaId: idea?.id,
       });
-      const project = createProject(draft);
-      router.push(`/project/${project.id}`);
-    }, 600);
+    }
+
+    // Always enforce the client's creatorId + a safe published default.
+    const project = createProject({ ...draft, creatorId, published: false });
+    router.push(`/project/${project.id}`);
   }
 
   function handleGenerate() {

@@ -16,6 +16,8 @@ type RemixModalProps = {
   onClose: () => void;
 };
 
+type ProjectDraft = Omit<Project, "id" | "createdAt" | "remixCount">;
+
 export function RemixModal({ parent, open, onClose }: RemixModalProps) {
   const router = useRouter();
   const { account, isSignedIn, requireAuth } = useAuth();
@@ -29,15 +31,41 @@ export function RemixModal({ parent, open, onClose }: RemixModalProps) {
     }
   }, [open]);
 
-  function performRemix(creatorId: string, remixPrompt: string) {
+  async function performRemix(creatorId: string, remixPrompt: string) {
     setBusy(true);
-    setTimeout(() => {
-      const draft = generateRemixDraft({ parent, remixPrompt, creatorId });
-      const child = remixProject(parent.id, draft);
-      if (child) {
-        router.push(`/project/${child.id}`);
+    let draft: ProjectDraft | undefined;
+    try {
+      const res = await fetch("/api/remix-project", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parentProjectId: parent.id,
+          // Always send the parent snapshot so the server can remix projects
+          // that only live in localStorage.
+          parent,
+          remixPrompt,
+          creatorId,
+        }),
+      });
+      if (res.ok) {
+        draft = (await res.json()) as ProjectDraft;
       }
-    }, 500);
+    } catch {
+      // fall through to template fallback
+    }
+
+    if (!draft) {
+      // Offline / API failure — keep the demo working with the deterministic
+      // template.
+      draft = generateRemixDraft({ parent, remixPrompt, creatorId });
+    }
+
+    const child = remixProject(parent.id, { ...draft, creatorId, published: false });
+    if (child) {
+      router.push(`/project/${child.id}`);
+    } else {
+      setBusy(false);
+    }
   }
 
   function submit() {
@@ -49,12 +77,14 @@ export function RemixModal({ parent, open, onClose }: RemixModalProps) {
       onClose();
       requireAuth({
         reason: "remix",
-        onSuccess: (acct) => performRemix(acct.id, remixPrompt),
+        onSuccess: (acct) => {
+          void performRemix(acct.id, remixPrompt);
+        },
       });
       return;
     }
     if (!account) return;
-    performRemix(account.id, remixPrompt);
+    void performRemix(account.id, remixPrompt);
   }
 
   return (

@@ -4,9 +4,21 @@ import { getProjectById, oceanCleanupAskAnswers, suggestedAskQuestions } from "@
 
 export const runtime = "nodejs";
 
+type ProjectSnapshot = {
+  id?: string;
+  title?: string;
+  description?: string;
+  codeHtml?: string;
+  codeCss?: string;
+  codeJs?: string;
+};
+
 type Body = {
   projectId?: string;
   question?: string;
+  // The client may send a snapshot of the current project so we can answer
+  // for projects that only live in the user's localStorage (not seed data).
+  project?: ProjectSnapshot;
 };
 
 type ClaudeShape = {
@@ -36,24 +48,38 @@ export async function POST(req: Request) {
     // ignore
   }
   const question = (body.question ?? "").trim();
-  const project = body.projectId ? getProjectById(body.projectId) : undefined;
+  const seed = body.projectId ? getProjectById(body.projectId) : undefined;
+  // Merge: prefer the client snapshot so Tinker-Mode edits and user-created
+  // projects are seen by Claude. Fall back to seed data when missing.
+  const resolved = {
+    id: body.project?.id ?? body.projectId ?? seed?.id,
+    title: body.project?.title ?? seed?.title ?? "",
+    description: body.project?.description ?? seed?.description ?? "",
+    codeHtml: body.project?.codeHtml ?? seed?.codeHtml ?? "",
+    codeCss: body.project?.codeCss ?? seed?.codeCss ?? "",
+    codeJs: body.project?.codeJs ?? seed?.codeJs ?? "",
+  };
 
-  // Fast-path: prewritten answer for the demo project's known questions.
-  const key = question.toLowerCase();
-  const exact = oceanCleanupAskAnswers[key];
-  if (exact) {
-    return NextResponse.json({
-      answer: exact.answer,
-      relatedConcepts: exact.relatedConcepts,
-      suggestedNextQuestions: exact.suggestedNext,
-      highlightLines: exact.highlightJsLines ? { file: "js", lines: exact.highlightJsLines } : undefined,
-    });
+  // Fast-path: prewritten answers, but ONLY for the demo project. Other
+  // projects share question phrasing (e.g. "how does the score work?") but
+  // the answers would name the wrong player/collectible.
+  if (resolved.id === "p_ocean") {
+    const key = question.toLowerCase();
+    const exact = oceanCleanupAskAnswers[key];
+    if (exact) {
+      return NextResponse.json({
+        answer: exact.answer,
+        relatedConcepts: exact.relatedConcepts,
+        suggestedNextQuestions: exact.suggestedNext,
+        highlightLines: exact.highlightJsLines ? { file: "js", lines: exact.highlightJsLines } : undefined,
+      });
+    }
   }
 
-  if (isAnthropicConfigured() && project && question.length > 0) {
+  if (isAnthropicConfigured() && question.length > 0 && resolved.title) {
     const ai = await askClaudeJson<ClaudeShape>({
       systemHint: SYSTEM_HINT,
-      userMessage: `Project: ${project.title}\nDescription: ${project.description}\n\n--- index.html ---\n${project.codeHtml}\n--- style.css ---\n${project.codeCss}\n--- game.js ---\n${project.codeJs}\n\nKid's question: ${question}\nReturn JSON only.`,
+      userMessage: `Project: ${resolved.title}\nDescription: ${resolved.description}\n\n--- index.html ---\n${resolved.codeHtml}\n--- style.css ---\n${resolved.codeCss}\n--- game.js ---\n${resolved.codeJs}\n\nKid's question: ${question}\nReturn JSON only.`,
       maxTokens: 600,
       effort: "low",
     });

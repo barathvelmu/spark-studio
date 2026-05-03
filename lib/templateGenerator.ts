@@ -233,6 +233,7 @@ export function generateProjectDraft(args: {
     nextChallenge: "Try adding a timer or a level-up when score reaches 10.",
     safetyStatus: "checked",
     gradient: theme.gradient,
+    published: false,
   };
 }
 
@@ -275,5 +276,6 @@ export function generateRemixDraft(args: {
     nextChallenge: "Try adding a timer.",
     safetyStatus: "checked",
     gradient: theme.gradient,
+    published: false,
   };
 }

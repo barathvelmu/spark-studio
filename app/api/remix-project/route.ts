@@ -10,6 +10,9 @@ type Body = {
   parentProjectId?: string;
   remixPrompt?: string;
   creatorId?: string;
+  // Optional parent snapshot so we can remix projects that only live in the
+  // client's localStorage (not in seed data).
+  parent?: Project;
 };
 
 type ClaudeShape = {
@@ -52,7 +55,10 @@ export async function POST(req: Request) {
   } catch {
     // ignore
   }
-  const parent: Project | undefined = body.parentProjectId ? getProjectById(body.parentProjectId) : undefined;
+  // Prefer the client snapshot (covers user-created projects in localStorage),
+  // fall back to seed data.
+  const parent: Project | undefined =
+    body.parent ?? (body.parentProjectId ? getProjectById(body.parentProjectId) : undefined);
   if (!parent) {
     return NextResponse.json({ error: "parent project not found" }, { status: 404 });
   }
@@ -102,6 +108,7 @@ export async function POST(req: Request) {
         nextChallenge: ai.nextChallenge || "Try adding a timer.",
         safetyStatus: "checked",
         gradient: ai.gradient || "indigo",
+        published: false,
       };
     } else {
       draft = generateRemixDraft({ parent, remixPrompt, creatorId });

@@ -14,7 +14,7 @@ export function HeroBanner() {
         </h1>
         <p className="text-body-lg text-text-muted max-w-2xl mx-auto mb-8">
           Every AI-generated change becomes a learning moment. Build, play, inspect the code,
-          ask questions, and remix.
+          ask questions, and remix!
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <ButtonLink href="/builder" variant="primary" size="lg">

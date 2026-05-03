@@ -27,50 +27,52 @@
 
 All colors as both `hex` and CSS custom property name. Use the property names in code.
 
+> **Palette mood:** Inspired by Claude's design language — warm cream backgrounds, terracotta orange brand, tan/camel accents, and warm dark-brown text. Earthy, gentle, optimistic. No cool indigo.
+
 ### Brand
 | Token | Hex | Use |
 |---|---|---|
-| `--color-primary` | `#6366F1` | Primary buttons, active tab underline, focus ring base |
-| `--color-primary-hover` | `#4F46E5` | Primary button hover |
-| `--color-primary-pressed` | `#4338CA` | Primary button active |
-| `--color-primary-soft` | `#EEF2FF` | Primary button ghost bg, selected card bg |
-| `--color-accent` | `#38BDF8` | Sky-blue accent — links, secondary highlights |
-| `--color-accent-soft` | `#E0F2FE` | Accent chip bg |
-| `--color-highlight` | `#FACC15` | Warm yellow — sparkle/celebration moments only |
-| `--color-highlight-soft` | `#FEF9C3` | Highlight chip bg |
+| `--color-primary` | `#CC785C` | Primary buttons, active tab underline, focus ring base (Claude terracotta) |
+| `--color-primary-hover` | `#B36046` | Primary button hover |
+| `--color-primary-pressed` | `#994E3A` | Primary button active |
+| `--color-primary-soft` | `#FAEDE5` | Primary button ghost bg, selected card bg (warm peach) |
+| `--color-accent` | `#C99A6B` | Camel/tan accent — links, secondary highlights |
+| `--color-accent-soft` | `#F5E8D7` | Accent chip bg |
+| `--color-highlight` | `#E8B85F` | Honey gold — sparkle/celebration moments only |
+| `--color-highlight-soft` | `#FAEFD3` | Highlight chip bg |
 
-### Semantic
+### Semantic (warmed to fit the palette)
 | Token | Hex | Use |
 |---|---|---|
-| `--color-success` | `#22C55E` | "Safety checked", learning concepts, success toast |
-| `--color-success-soft` | `#DCFCE7` | Success badge bg |
-| `--color-warning` | `#F59E0B` | Caution toast (rare) |
-| `--color-danger` | `#EF4444` | Destructive only — delete confirmation |
-| `--color-info` | `#0EA5E9` | Info toast |
+| `--color-success` | `#6B8E4E` | "Safety checked", learning concepts, success toast (warm olive) |
+| `--color-success-soft` | `#E5EDD7` | Success badge bg |
+| `--color-warning` | `#D49A4F` | Caution toast (rare) — amber |
+| `--color-danger` | `#C85A4F` | Destructive only — warm red |
+| `--color-info` | `#8B7355` | Info toast — taupe |
 
-### Neutrals (slightly cool, never pure gray)
+### Neutrals (warm cream + brown, never pure gray)
 | Token | Hex | Use |
 |---|---|---|
-| `--color-bg` | `#FAFAFF` | Page background (a hair of lavender) |
+| `--color-bg` | `#FAF9F5` | Page background (Claude cream) |
 | `--color-surface` | `#FFFFFF` | Cards, panels, modals |
-| `--color-surface-muted` | `#F4F4FB` | Code viewer bg, input bg |
-| `--color-border` | `#E5E7F0` | Default border |
-| `--color-border-strong` | `#CBD0E0` | Hovered/focused border |
-| `--color-text` | `#1E1B4B` | Body text (deep indigo-black, not pure black) |
-| `--color-text-muted` | `#5B5F7A` | Secondary text, captions |
-| `--color-text-subtle` | `#8B90A8` | Placeholders, disabled |
+| `--color-surface-muted` | `#F2EDE4` | Code viewer bg, input bg (warm beige) |
+| `--color-border` | `#E8DDD0` | Default border (warm tan) |
+| `--color-border-strong` | `#CFBFAA` | Hovered/focused border |
+| `--color-text` | `#2C1810` | Body text (warm dark brown, not pure black) |
+| `--color-text-muted` | `#6B5B4D` | Secondary text, captions |
+| `--color-text-subtle` | `#9C8B7C` | Placeholders, disabled |
 
 ### Code viewer palette (single, always-light theme)
 | Token | Hex | Use |
 |---|---|---|
-| `--code-bg` | `#F8F8FC` | Editor background |
-| `--code-text` | `#1E1B4B` | Default text |
-| `--code-keyword` | `#6366F1` | `if`, `function`, `let`, `const` |
-| `--code-string` | `#22C55E` | String literals |
-| `--code-number` | `#F59E0B` | Number literals |
-| `--code-comment` | `#8B90A8` | Comments |
-| `--code-function` | `#0EA5E9` | Function names |
-| `--code-line-highlight` | `#EEF2FF` | "Look here" line highlight |
+| `--code-bg` | `#F8F4ED` | Editor background |
+| `--code-text` | `#2C1810` | Default text |
+| `--code-keyword` | `#CC785C` | `if`, `function`, `let`, `const` (terracotta) |
+| `--code-string` | `#6B8E4E` | String literals (warm olive) |
+| `--code-number` | `#D49A4F` | Number literals (amber) |
+| `--code-comment` | `#9C8B7C` | Comments |
+| `--code-function` | `#8B5E3C` | Function names (deep warm brown) |
+| `--code-line-highlight` | `#FAEDE5` | "Look here" line highlight |
 
 **Rule:** No new colors. If a state needs emphasis, use an existing soft variant (e.g. `primary-soft`).
 
@@ -120,13 +122,13 @@ Never go below 14px for body. Never bold body text mid-sentence; use a chip or c
 
 Pillowy is the rule — cards and buttons default to `--radius-lg` (24px) or larger.
 
-### Shadow (chunky and soft, never tight)
+### Shadow (chunky and soft, never tight — warm-brown base)
 ```css
---shadow-sm: 0 2px 4px rgba(30, 27, 75, 0.06);
---shadow-md: 0 6px 16px rgba(30, 27, 75, 0.08), 0 2px 4px rgba(30, 27, 75, 0.04);
---shadow-lg: 0 16px 32px rgba(30, 27, 75, 0.10), 0 4px 8px rgba(30, 27, 75, 0.06);
---shadow-xl: 0 24px 48px rgba(30, 27, 75, 0.14), 0 8px 16px rgba(30, 27, 75, 0.08);
---shadow-press: 0 1px 0 rgba(30, 27, 75, 0.10);  /* button "pressed" inset */
+--shadow-sm: 0 2px 4px rgba(44, 24, 16, 0.06);
+--shadow-md: 0 6px 16px rgba(44, 24, 16, 0.08), 0 2px 4px rgba(44, 24, 16, 0.04);
+--shadow-lg: 0 16px 32px rgba(44, 24, 16, 0.10), 0 4px 8px rgba(44, 24, 16, 0.06);
+--shadow-xl: 0 24px 48px rgba(44, 24, 16, 0.14), 0 8px 16px rgba(44, 24, 16, 0.08);
+--shadow-press: 0 1px 0 rgba(44, 24, 16, 0.10);  /* button "pressed" inset */
 ```
 
 Cards default to `--shadow-md`; on hover lift to `--shadow-lg` and translate `-2px` Y.
@@ -214,7 +216,7 @@ Padding: `0 24px` md, `0 20px` sm, `0 32px` lg. Gap to icon `--space-3` (12px).
 
 - Height 48px (input), min 96px (textarea). `--radius-md` (16px).
 - bg `--color-surface-muted`, border 1.5px transparent.
-- Focus: bg `--color-surface`, border `--color-primary`, ring `0 0 0 4px rgba(99, 102, 241, 0.15)`.
+- Focus: bg `--color-surface`, border `--color-primary`, ring `0 0 0 4px rgba(204, 120, 92, 0.15)`.
 - Placeholder `--color-text-subtle`.
 - Label sits *above*, weight 600, `--space-2` (8px) gap, `text-body-sm` size.
 - Helper text below in `text-tiny`, `--color-text-muted`. Errors swap to `--color-danger`.
@@ -276,7 +278,7 @@ Pill-on-rail style.
 - Centered, max-width 520px (default) / 720px (large).
 - `--color-surface`, `--radius-xl` (32px), `--shadow-xl`.
 - Padding `--space-8` (40px).
-- Backdrop: `rgba(30, 27, 75, 0.40)`, 200ms fade.
+- Backdrop: `rgba(44, 24, 16, 0.40)`, 200ms fade.
 - Open animation: 320ms scale 0.96→1 + opacity, `--ease-spring`.
 - Close affordance: ghost icon button top-right (`X`), 40×40 hit target.
 - Title `text-h3`, body `text-body`, action row right-aligned with `--space-3` gap, primary on the right.
@@ -346,7 +348,7 @@ Center-aligned in a card, `--space-9` (56px) vertical padding.
   - Mint: `linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%)`
   - Peach: `linear-gradient(135deg, #FFEDD5 0%, #FED7AA 100%)`
   - Lavender: `linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%)`
-- **Built projects:** live screenshot at 16:9, fit cover. Add a 1px inner shadow `inset 0 0 0 1px rgba(30,27,75,0.04)` to give it a subtle frame.
+- **Built projects:** live screenshot at 16:9, fit cover. Add a 1px inner shadow `inset 0 0 0 1px rgba(44,24,16,0.04)` to give it a subtle frame.
 
 Never auto-generate AI illustrations as decorative chrome. Real screenshots > generated images for built projects.
 
@@ -375,7 +377,7 @@ Mix three tones, by surface:
 ## 11. Accessibility
 
 - Color contrast: text on bg ≥ 4.5:1 for body, ≥ 3:1 for large headings. Verified for the tokens above on `--color-bg` and `--color-surface`.
-- Focus ring: 4px `rgba(99, 102, 241, 0.35)` halo + 2px `--color-primary` inner — visible on **every** interactive element.
+- Focus ring: 4px `rgba(204, 120, 92, 0.35)` halo + 2px `--color-primary` inner — visible on **every** interactive element.
 - Hit targets: minimum 44×44px.
 - Respect `prefers-reduced-motion` (see Motion).
 - Reaction buttons and tabs operable with keyboard (Tab, Enter/Space, arrow keys for tab strip).

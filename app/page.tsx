@@ -6,6 +6,55 @@ import { getProjectById } from "@/lib/mockData";
 import { ButtonLink } from "@/components/ui/Button";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SafetyBadge } from "@/components/SafetyBadge";
+import { HeroBanner } from "@/components/HeroBanner";
+
+type BgParticle = {
+  emoji: string;
+  top: string;
+  left?: string;
+  right?: string;
+  size: string;
+  delay: string;
+  duration: string;
+  hideMobile?: boolean;
+};
+
+const BG_PARTICLES: BgParticle[] = [
+  { emoji: "🎮", top: "8%",  left: "5%",  size: "2.5rem",  delay: "0s",   duration: "7.5s" },
+  { emoji: "🚀", top: "10%", right: "6%", size: "2.25rem", delay: "0.6s", duration: "8s" },
+  { emoji: "💡", top: "4%",  left: "22%", size: "1.5rem",  delay: "1.5s", duration: "11s",   hideMobile: true },
+  { emoji: "🎨", top: "6%",  right: "22%",size: "1.5rem",  delay: "0.3s", duration: "9.5s",  hideMobile: true },
+  { emoji: "🌊", top: "28%", left: "3%",  size: "2rem",    delay: "1.2s", duration: "9s" },
+  { emoji: "⭐", top: "32%", right: "4%", size: "1.75rem", delay: "2s",   duration: "10s" },
+  { emoji: "🎵", top: "38%", right: "13%",size: "1.5rem",  delay: "0.9s", duration: "8.5s",  hideMobile: true },
+  { emoji: "🌿", top: "42%", left: "15%", size: "1.5rem",  delay: "2.2s", duration: "12s",   hideMobile: true },
+  { emoji: "🐠", top: "58%", left: "5%",  size: "2rem",    delay: "1.8s", duration: "9.5s" },
+  { emoji: "🛸", top: "62%", right: "7%", size: "1.75rem", delay: "0.4s", duration: "11s" },
+  { emoji: "🎯", top: "68%", left: "18%", size: "1.5rem",  delay: "2.8s", duration: "10.5s", hideMobile: true },
+  { emoji: "🌟", top: "74%", right: "20%",size: "1.5rem",  delay: "1.1s", duration: "8s",    hideMobile: true },
+  { emoji: "🦋", top: "85%", left: "8%",  size: "2rem",    delay: "0.7s", duration: "9s" },
+  { emoji: "🎪", top: "88%", right: "9%", size: "1.75rem", delay: "2.4s", duration: "12s" },
+];
+
+type BgOrb = {
+  top: string;
+  left?: string;
+  right?: string;
+  translate?: string;
+  w: string;
+  h: string;
+  color: string;
+  duration: string;
+  delay: string;
+};
+
+const BG_ORBS: BgOrb[] = [
+  { top: "2%",  left: "15%",  w: "28rem", h: "28rem", color: "var(--color-primary)",   duration: "6s",   delay: "0s" },
+  { top: "6%",  right: "12%", w: "32rem", h: "32rem", color: "var(--color-accent)",    duration: "7.5s", delay: "1s" },
+  { top: "35%", left: "50%",  translate: "-translate-x-1/2", w: "40rem", h: "24rem", color: "var(--color-highlight)", duration: "9s", delay: "2s" },
+  { top: "60%", left: "8%",   w: "24rem", h: "24rem", color: "var(--color-accent)",    duration: "8s",   delay: "0.5s" },
+  { top: "70%", right: "10%", w: "28rem", h: "28rem", color: "var(--color-primary)",   duration: "10s",  delay: "1.5s" },
+];
 
 type StepId = "idea" | "build" | "play" | "code" | "remix" | "learn";
 
@@ -112,25 +161,53 @@ export default function LandingPage() {
   const activeData = HOW_IT_WORKS.find((s) => s.id === activeStep);
 
   return (
-    <div className="max-w-page mx-auto px-7 lg:px-9">
+    <div className="relative">
+      {/* Full-page animated orbs */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        {BG_ORBS.map((orb, i) => (
+          <div
+            key={i}
+            className={`absolute rounded-pill blur-3xl hero-orb ${orb.translate ?? ""}`}
+            style={{
+              top: orb.top,
+              left: orb.left,
+              right: orb.right,
+              width: orb.w,
+              height: orb.h,
+              background: orb.color,
+              animationDuration: orb.duration,
+              animationDelay: orb.delay,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Full-page floating emoji particles */}
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        {BG_PARTICLES.map((p, i) => (
+          <span
+            key={i}
+            className={[
+              "absolute select-none hero-float opacity-70 drop-shadow-sm",
+              p.hideMobile ? "hidden md:inline-block" : "inline-block",
+            ].join(" ")}
+            style={{
+              top: p.top,
+              left: p.left,
+              right: p.right,
+              fontSize: p.size,
+              animationDelay: p.delay,
+              animationDuration: p.duration,
+            }}
+          >
+            {p.emoji}
+          </span>
+        ))}
+      </div>
+
+      <div className="max-w-page mx-auto px-7 lg:px-9">
       {/* Hero */}
-      <section className="text-center pt-11 pb-9">
-        <h1 className="font-display text-display text-text mb-6 tracking-tight">
-          Make something only you would think of.
-        </h1>
-        <p className="text-body-lg text-text-muted max-w-2xl mx-auto mb-8">
-          Every AI-generated change becomes a learning moment. Build, play, inspect the code,
-          ask questions, and remix.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <ButtonLink href="/builder" variant="primary" size="lg">
-            Start Building
-          </ButtonLink>
-          <ButtonLink href="/discover" variant="secondary" size="lg">
-            Explore Projects
-          </ButtonLink>
-        </div>
-      </section>
+      <HeroBanner />
 
       {/* How it works */}
       <section className="py-9" aria-labelledby="how-it-works">
@@ -268,6 +345,7 @@ export default function LandingPage() {
           </ButtonLink>
         </div>
       </section>
+      </div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         className={[
           "flex items-center gap-2 h-[48px] px-4 rounded-md transition-colors",
           "bg-surface-muted border-[1.5px] border-transparent",
-          "focus-within:bg-surface focus-within:border-primary focus-within:shadow-[0_0_0_4px_rgba(99,102,241,0.15)]",
+          "focus-within:bg-surface focus-within:border-primary focus-within:shadow-[0_0_0_4px_rgba(204,120,92,0.15)]",
           error ? "border-danger focus-within:border-danger" : "",
         ]
           .filter(Boolean)

@@ -90,7 +90,7 @@ export function Modal({
         onClick={() => {
           if (closeOnBackdrop) onClose();
         }}
-        className="absolute inset-0 bg-[rgba(30,27,75,0.40)] animate-spark-fade-in"
+        className="absolute inset-0 bg-[rgba(44,24,16,0.40)] animate-spark-fade-in"
         style={{ animation: "spark-fade-in 200ms ease-out forwards" }}
       />
       <div

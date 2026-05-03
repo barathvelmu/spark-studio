@@ -7,7 +7,7 @@ const PLAY_WIDTH = 600;
 const PLAY_HEIGHT = 360;
 const STEP = 16;
 const EMOJI_SIZE = 32;
-const COLLECT_RADIUS = 32;
+const COLLECT_RADIUS = 64; // generous so click-near-collectible reliably scores
 const WIN_SCORE = 10;
 
 const BACKGROUNDS: Record<CollectorGameConfig["background"], string> = {
@@ -137,6 +137,9 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
   return (
     <div className="flex flex-col items-center gap-3 w-full">
       <p className="text-body-sm text-text-muted text-center">{config.goal}</p>
+      <p className="text-tiny text-text-muted text-center">
+        🖱️ Click anywhere in the play area to move · ⌨️ or use arrow keys
+      </p>
       <p className="font-display text-h3 text-text">Score: {score}</p>
 
       <div

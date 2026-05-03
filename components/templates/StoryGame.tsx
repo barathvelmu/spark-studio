@@ -60,9 +60,10 @@ export function StoryGame({ config }: { config: StoryGameConfig }): ReactElement
 
   return (
     <div className="bg-surface rounded-xl shadow-md p-7 max-w-[700px] mx-auto">
-      <p className="text-tiny font-semibold text-text-muted uppercase tracking-wide mb-2">
+      <p className="text-tiny font-semibold text-text-muted uppercase tracking-wide mb-1">
         Story
       </p>
+      <p className="text-tiny text-text-muted mb-1">🖱️ Click a choice to continue the story</p>
       <p className="text-tiny text-text-muted mb-3">
         📜 Choices made: {visited.length}
       </p>

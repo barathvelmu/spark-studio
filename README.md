@@ -4,7 +4,7 @@
 
 > **Every AI-generated change becomes a learning moment.**
 
-Built at **Claude Builders @ MIT — *Machines of Loving Grace* Spring Sprint Hackathon** (May 3, 2026, sponsored by Anthropic). **3rd place** — $250 + $250 in Anthropic credits.
+Built at **Claude Builders @ MIT — *Machines of Loving Grace* Spring Sprint Hackathon** (May 3, 2026). Presenting sponsor **Anthropic**; supporting sponsors **Jane Street** and **HRT**. **3rd place** — $250 + $250 in Anthropic credits.
 
 ---
 
@@ -130,6 +130,10 @@ Architectural cuts that would be the next features in a hosted version: real DB 
 ## Credits
 
 Built by [@barathvelmu](https://github.com/barathvelmu) and [@AshritVerma](https://github.com/AshritVerma).
+
+**Hackathon:** Claude Builders @ MIT — *Machines of Loving Grace* Spring Sprint Hackathon, May 3, 2026, Stata 32-141.
+
+**Sponsors:** Presenting — [Anthropic](https://www.anthropic.com). Supporting — [Jane Street](https://www.janestreet.com) and [HRT](https://www.hudsonrivertrading.com).
 
 ---
 

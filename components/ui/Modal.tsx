@@ -43,7 +43,12 @@ export function Modal({
     const focusable = dialog?.querySelectorAll<HTMLElement>(
       'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
     );
-    focusable?.[0]?.focus();
+    // Prefer the first text input or textarea over the X close button (which is first in DOM order).
+    // Falls back to the first focusable if no input/textarea exists.
+    const firstField = dialog?.querySelector<HTMLElement>(
+      'input:not([disabled]):not([type="hidden"]), textarea:not([disabled])'
+    );
+    (firstField ?? focusable?.[0])?.focus();
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";

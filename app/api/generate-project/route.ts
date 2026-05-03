@@ -9,6 +9,7 @@ type Body = {
   prompt?: string;
   projectType?: ProjectType | "auto";
   ideaId?: string;
+  creatorId?: string;
 };
 
 // What we ask Claude for. We only let it pick the *theme/config*; we still
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
   }
   const prompt = body.prompt ?? "";
   const projectType = body.projectType ?? "auto";
+  const creatorId = body.creatorId?.trim() || "u_maya";
 
   let draft: ProjectDraft;
 
@@ -73,7 +75,7 @@ export async function POST(req: Request) {
       draft = {
         title: ai.title || "New Collector Game",
         description: ai.description || `Move the player to collect ${(ai.noun || "items").toLowerCase()}.`,
-        creatorId: "u_maya",
+        creatorId,
         projectType: "collector_game",
         originalIdeaId: body.ideaId,
         config: {
@@ -99,10 +101,10 @@ export async function POST(req: Request) {
         gradient: ai.gradient || "sky",
       };
     } else {
-      draft = generateProjectDraft({ prompt, projectType, originalIdeaId: body.ideaId });
+      draft = generateProjectDraft({ prompt, projectType, creatorId, originalIdeaId: body.ideaId });
     }
   } else {
-    draft = generateProjectDraft({ prompt, projectType, originalIdeaId: body.ideaId });
+    draft = generateProjectDraft({ prompt, projectType, creatorId, originalIdeaId: body.ideaId });
   }
 
   return NextResponse.json(draft);

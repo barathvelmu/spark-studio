@@ -8,6 +8,7 @@ import { remixProject } from "@/lib/projectStore";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
+import { useAuth } from "@/lib/auth";
 
 type RemixModalProps = {
   parent: Project;
@@ -17,6 +18,7 @@ type RemixModalProps = {
 
 export function RemixModal({ parent, open, onClose }: RemixModalProps) {
   const router = useRouter();
+  const { account, isSignedIn, requireAuth } = useAuth();
   const [prompt, setPrompt] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -27,16 +29,32 @@ export function RemixModal({ parent, open, onClose }: RemixModalProps) {
     }
   }, [open]);
 
-  function submit() {
-    if (busy || !prompt.trim()) return;
+  function performRemix(creatorId: string, remixPrompt: string) {
     setBusy(true);
     setTimeout(() => {
-      const draft = generateRemixDraft({ parent, remixPrompt: prompt });
+      const draft = generateRemixDraft({ parent, remixPrompt, creatorId });
       const child = remixProject(parent.id, draft);
       if (child) {
         router.push(`/project/${child.id}`);
       }
     }, 500);
+  }
+
+  function submit() {
+    if (busy || !prompt.trim()) return;
+    const remixPrompt = prompt;
+
+    if (!isSignedIn) {
+      // Close this modal so the auth modal isn't stacked on top of it.
+      onClose();
+      requireAuth({
+        reason: "remix",
+        onSuccess: (acct) => performRemix(acct.id, remixPrompt),
+      });
+      return;
+    }
+    if (!account) return;
+    performRemix(account.id, remixPrompt);
   }
 
   return (
@@ -72,6 +90,11 @@ export function RemixModal({ parent, open, onClose }: RemixModalProps) {
         placeholder="Make it about space junk instead of ocean plastic"
         autoFocus
       />
+      {!isSignedIn ? (
+        <p className="text-tiny text-text-muted mt-3">
+          We'll set up a quick account when you tap Remix. No password needed.
+        </p>
+      ) : null}
     </Modal>
   );
 }

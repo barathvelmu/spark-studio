@@ -1,4 +1,5 @@
 import type { Idea, Project, User } from "./types";
+import { findAccountById, findAccountByHandle } from "./accountStore";
 
 export const users: User[] = [
   { id: "u_maya", handle: "maya", emoji: "🌊" },
@@ -324,6 +325,22 @@ export function getProjectById(id: string): Project | undefined {
 
 export function getUserById(id: string): User | undefined {
   return users.find((u) => u.id === id);
+}
+
+// Resolves a creator by id. Live accounts created via sign-up take precedence
+// over the seeded mock users; falls back to the mock list.
+export function resolveCreator(id: string): User | undefined {
+  const account = findAccountById(id);
+  if (account) return account;
+  return users.find((u) => u.id === id);
+}
+
+// Resolves a user/account by handle (case-insensitive).
+export function resolveUserByHandle(handle: string): User | undefined {
+  const norm = handle.trim().toLowerCase();
+  const account = findAccountByHandle(norm);
+  if (account) return account;
+  return users.find((u) => u.handle.toLowerCase() === norm);
 }
 
 export function getIdeaById(id: string): Idea | undefined {

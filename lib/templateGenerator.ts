@@ -189,10 +189,10 @@ export type ProjectDraft = Omit<Project, "id" | "createdAt" | "remixCount">;
 export function generateProjectDraft(args: {
   prompt: string;
   projectType: ProjectType | "auto";
-  creatorId?: string;
+  creatorId: string;
   originalIdeaId?: string;
 }): ProjectDraft {
-  const { prompt, projectType, creatorId = "u_maya", originalIdeaId } = args;
+  const { prompt, projectType, creatorId, originalIdeaId } = args;
   const theme = pickTheme(prompt);
   // For must-ship, every "auto" or "collector_game" generation uses the collector path.
   // Quiz/Story stretch goals would branch here.
@@ -236,8 +236,12 @@ export function generateProjectDraft(args: {
   };
 }
 
-export function generateRemixDraft(args: { parent: Project; remixPrompt: string }): ProjectDraft {
-  const { parent, remixPrompt } = args;
+export function generateRemixDraft(args: {
+  parent: Project;
+  remixPrompt: string;
+  creatorId: string;
+}): ProjectDraft {
+  const { parent, remixPrompt, creatorId } = args;
   const theme = pickTheme(remixPrompt);
   const noun = theme.collectible === "🧴" ? "Plastic" : theme.collectible === "🛰️" ? "Space Junk" : theme.collectible === "🌰" ? "Acorn" : theme.collectible === "♻️" ? "Recycling" : "Star";
   const code = makeCollectorCode(theme.player, theme.collectible, theme.background, noun);
@@ -245,7 +249,7 @@ export function generateRemixDraft(args: { parent: Project; remixPrompt: string 
   return {
     title: theme.title,
     description: `Remix of ${parent.title}. Built from: "${remixPrompt.trim()}".`,
-    creatorId: parent.creatorId,
+    creatorId,
     projectType: "collector_game",
     forkedFromProjectId: parent.id,
     originalIdeaId: parent.originalIdeaId,

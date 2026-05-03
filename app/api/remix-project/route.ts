@@ -9,6 +9,7 @@ export const runtime = "nodejs";
 type Body = {
   parentProjectId?: string;
   remixPrompt?: string;
+  creatorId?: string;
 };
 
 type ClaudeShape = {
@@ -56,6 +57,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "parent project not found" }, { status: 404 });
   }
   const remixPrompt = body.remixPrompt ?? "";
+  const creatorId = body.creatorId?.trim() || parent.creatorId;
 
   let draft: ProjectDraft;
 
@@ -72,7 +74,7 @@ export async function POST(req: Request) {
       draft = {
         title: ai.title || "Remix",
         description: ai.description || `Remix of ${parent.title}.`,
-        creatorId: parent.creatorId,
+        creatorId,
         projectType: "collector_game",
         forkedFromProjectId: parent.id,
         originalIdeaId: parent.originalIdeaId,
@@ -102,10 +104,10 @@ export async function POST(req: Request) {
         gradient: ai.gradient || "indigo",
       };
     } else {
-      draft = generateRemixDraft({ parent, remixPrompt });
+      draft = generateRemixDraft({ parent, remixPrompt, creatorId });
     }
   } else {
-    draft = generateRemixDraft({ parent, remixPrompt });
+    draft = generateRemixDraft({ parent, remixPrompt, creatorId });
   }
 
   return NextResponse.json(draft);

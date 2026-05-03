@@ -2,29 +2,8 @@
 
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const STORAGE_KEY = "spark.saved_ideas.v1";
-
-function readSaved(): Set<string> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
-    const arr = JSON.parse(raw) as string[];
-    return new Set(arr);
-  } catch {
-    return new Set();
-  }
-}
-
-function writeSaved(set: Set<string>) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
-  } catch {
-    // non-fatal
-  }
-}
+import { useAuth } from "@/lib/auth";
+import { isIdeaSaved, setIdeaSaved } from "@/lib/savedIdeas";
 
 export type SaveIdeaButtonProps = {
   ideaId: string;
@@ -32,18 +11,29 @@ export type SaveIdeaButtonProps = {
 };
 
 export function SaveIdeaButton({ ideaId, className = "" }: SaveIdeaButtonProps) {
+  const { account, hydrated, requireAuth } = useAuth();
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setSaved(readSaved().has(ideaId));
-  }, [ideaId]);
+    if (!hydrated) return;
+    setSaved(isIdeaSaved(account?.id, ideaId));
+  }, [hydrated, account?.id, ideaId]);
+
+  function applyToggle(accountId: string) {
+    const cur = isIdeaSaved(accountId, ideaId);
+    setIdeaSaved(accountId, ideaId, !cur);
+    setSaved(!cur);
+  }
 
   function toggle() {
-    const set = readSaved();
-    if (set.has(ideaId)) set.delete(ideaId);
-    else set.add(ideaId);
-    writeSaved(set);
-    setSaved(set.has(ideaId));
+    if (!account) {
+      requireAuth({
+        reason: "sign_in",
+        onSuccess: (acct) => applyToggle(acct.id),
+      });
+      return;
+    }
+    applyToggle(account.id);
   }
 
   const Icon = saved ? BookmarkCheck : Bookmark;

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, JetBrains_Mono } from "next/font/google";
+import { Fredoka, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { ToastProvider } from "@/components/ui/Toast";
+import { AuthProvider } from "@/lib/auth";
+import { AuthModal } from "@/components/auth/AuthModal";
 
-const playfair = Playfair_Display({
+const fredoka = Fredoka({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-nunito",
   display: "swap",
 });
@@ -33,11 +35,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${fredoka.variable} ${inter.variable} ${jetbrains.variable}`}>
       <body>
         <ToastProvider>
-          <Header />
-          <main>{children}</main>
+          <AuthProvider>
+            <Header />
+            <main>{children}</main>
+            <AuthModal />
+          </AuthProvider>
         </ToastProvider>
       </body>
     </html>

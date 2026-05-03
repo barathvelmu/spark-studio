@@ -5,6 +5,8 @@ import Link from "next/link";
 import type { CodeFile } from "@/components/CodeView";
 import { CodeView } from "@/components/CodeView";
 import { CollectorGame } from "@/components/templates/CollectorGame";
+import { QuizGame } from "@/components/templates/QuizGame";
+import { StoryGame } from "@/components/templates/StoryGame";
 import { AskTheCodePanel } from "@/components/AskTheCodePanel";
 import { TinkerMode } from "@/components/TinkerMode";
 import type { TinkerFile } from "@/lib/tinker";
@@ -15,7 +17,7 @@ import { ConceptChip } from "@/components/ConceptChip";
 import { ReactionButtons } from "@/components/ReactionButtons";
 import { getProject } from "@/lib/projectStore";
 import { getProjectById, resolveCreator } from "@/lib/mockData";
-import type { CollectorGameConfig, Project } from "@/lib/types";
+import type { CollectorGameConfig, Project, QuizGameConfig, StoryGameConfig } from "@/lib/types";
 
 type Tab = "play" | "code" | "learn";
 
@@ -156,6 +158,20 @@ function PlayTab({ project }: { project: Project }) {
     return (
       <div className="bg-surface rounded-xl shadow-md p-7">
         <CollectorGame config={project.config as CollectorGameConfig} />
+      </div>
+    );
+  }
+  if (project.projectType === "quiz_game") {
+    return (
+      <div className="bg-surface rounded-xl shadow-md p-7">
+        <QuizGame config={project.config as QuizGameConfig} />
+      </div>
+    );
+  }
+  if (project.projectType === "story") {
+    return (
+      <div className="bg-surface rounded-xl shadow-md p-7">
+        <StoryGame config={project.config as StoryGameConfig} />
       </div>
     );
   }

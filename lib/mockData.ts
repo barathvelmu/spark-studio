@@ -1,4 +1,5 @@
 import type { Idea, Project, User } from "./types";
+import { makeCollectorCode } from "./templateGenerator";
 
 export const users: User[] = [
   { id: "u_maya", handle: "maya", emoji: "🌊" },
@@ -349,22 +350,10 @@ document.getElementById("restart").addEventListener("click", () => {
 showScene();
 `;
 
-// Space Junk variant: same code, swapped player + collectible.
-const spaceJunkHtml = oceanCleanupHtml
-  .replace("Ocean Cleanup Game", "Space Junk Rescue")
-  .replace("turtle", "astronaut")
-  .replace("plastic", "space junk")
-  .replace("🐢", "👩‍🚀")
-  .replace("🧴", "🛰️");
-
-const spaceJunkCss = oceanCleanupCss
-  .replace("ocean", "space")
-  .replace("#BAE6FD", "#1E1B4B")
-  .replace("#38BDF8", "#312E81");
-
-const spaceJunkJs = oceanCleanupJs
-  .replace(/turtle/g, "astronaut")
-  .replace(/plastic/g, "junk");
+// Space Junk + Dragon Star use the parameterized collector template so HTML/CSS/JS
+// are internally consistent (id selectors, getElementById calls, etc.).
+const spaceJunkCode = makeCollectorCode("👩‍🚀", "🛰️", "space", "Space Junk");
+const dragonStarCode = makeCollectorCode("🐉", "⭐", "space", "Star");
 
 export const projects: Project[] = [
   {
@@ -413,9 +402,9 @@ export const projects: Project[] = [
     },
     tags: ["Game", "Space", "Remix"],
     concepts: ["variables", "events", "conditionals", "loops"],
-    codeHtml: spaceJunkHtml,
-    codeCss: spaceJunkCss,
-    codeJs: spaceJunkJs,
+    codeHtml: spaceJunkCode.html,
+    codeCss: spaceJunkCode.css,
+    codeJs: spaceJunkCode.js,
     learningSummary:
       "You reused the same movement, score, and collision logic, but changed the theme and objects.",
     changeSummary: [
@@ -514,9 +503,9 @@ export const projects: Project[] = [
     },
     tags: ["Game", "Fantasy"],
     concepts: ["events", "score", "collision"],
-    codeHtml: oceanCleanupHtml.replace("🐢", "🐉").replace("🧴", "⭐"),
-    codeCss: oceanCleanupCss.replace("#BAE6FD", "#1E1B4B").replace("#38BDF8", "#312E81"),
-    codeJs: oceanCleanupJs,
+    codeHtml: dragonStarCode.html,
+    codeCss: dragonStarCode.css,
+    codeJs: dragonStarCode.js,
     learningSummary:
       "This game uses keyboard events, a score variable, and collision detection.",
     changeSummary: ["Made a dragon player", "Stars instead of plastic", "Night sky background"],

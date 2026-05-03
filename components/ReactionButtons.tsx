@@ -111,7 +111,7 @@ export function ReactionButtons({ projectId, className = "" }: ReactionButtonsPr
             aria-pressed={isActive}
             onClick={() => toggle(r.id)}
             className={[
-              "inline-flex items-center gap-2 h-9 px-4 rounded-pill text-label font-semibold transition-all duration-200 ease-spring",
+              "inline-flex items-center gap-2 h-[36px] px-4 rounded-pill text-label font-semibold transition-all duration-200 ease-spring",
               isActive
                 ? "bg-primary-soft text-primary"
                 : "bg-transparent text-text-muted hover:bg-surface-muted hover:text-text",
@@ -122,7 +122,7 @@ export function ReactionButtons({ projectId, className = "" }: ReactionButtonsPr
             <span>{r.label}</span>
             {count > 0 ? (
               <span
-                className={`inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-pill text-tiny ${
+                className={`inline-flex items-center justify-center min-w-[20px] h-[20px] px-1 rounded-pill text-tiny ${
                   isActive ? "bg-primary text-white" : "bg-surface-muted text-text-muted"
                 }`}
               >

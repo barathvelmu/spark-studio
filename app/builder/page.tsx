@@ -7,6 +7,7 @@ import { generateProjectDraft } from "@/lib/templateGenerator";
 import { createProject } from "@/lib/projectStore";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Textarea";
+import { useAuth } from "@/lib/auth";
 import type { ProjectType } from "@/lib/types";
 
 type SelectableType = "auto" | "collector_game" | "quiz_game" | "story";
@@ -44,6 +45,7 @@ function BuilderInner() {
   const searchParams = useSearchParams();
   const ideaId = searchParams.get("ideaId");
   const idea = useMemo(() => (ideaId ? getIdeaById(ideaId) : undefined), [ideaId]);
+  const { account, isSignedIn, hydrated, requireAuth } = useAuth();
 
   const [prompt, setPrompt] = useState(idea?.description ?? "");
   const initialType: SelectableType =
@@ -52,14 +54,14 @@ function BuilderInner() {
   const [isBuilding, setIsBuilding] = useState(false);
   const autoBuildRef = useRef(false);
 
-  function handleGenerate() {
-    if (isBuilding || !prompt.trim()) return;
+  function buildWithCreator(creatorId: string, currentPrompt: string, type: SelectableType) {
     setIsBuilding(true);
-    const resolvedType: ProjectType | "auto" = projectType;
+    const resolvedType: ProjectType | "auto" = type;
     setTimeout(() => {
       const draft = generateProjectDraft({
-        prompt,
+        prompt: currentPrompt,
         projectType: resolvedType,
+        creatorId,
         originalIdeaId: idea?.id,
       });
       const project = createProject(draft);
@@ -67,13 +69,31 @@ function BuilderInner() {
     }, 600);
   }
 
+  function handleGenerate() {
+    if (isBuilding || !prompt.trim()) return;
+    const currentPrompt = prompt;
+    const currentType = projectType;
+
+    if (!isSignedIn) {
+      requireAuth({
+        reason: "build",
+        onSuccess: (acct) => buildWithCreator(acct.id, currentPrompt, currentType),
+      });
+      return;
+    }
+    if (!account) return;
+    buildWithCreator(account.id, currentPrompt, currentType);
+  }
+
   useEffect(() => {
-    if (idea && !autoBuildRef.current) {
+    // Auto-build only after auth state is hydrated, so the auth gate can fire
+    // for new users coming in from the Idea Wall.
+    if (idea && hydrated && !autoBuildRef.current) {
       autoBuildRef.current = true;
       handleGenerate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idea]);
+  }, [idea, hydrated]);
 
   return (
     <div className="max-w-page mx-auto px-7 lg:px-9 py-11">
@@ -128,6 +148,11 @@ function BuilderInner() {
           >
             {isBuilding ? "Building your project…" : "Generate"}
           </Button>
+          {!isSignedIn && hydrated ? (
+            <p className="text-tiny text-text-muted mt-3 text-center">
+              We'll set up a quick account when you tap Generate. No password needed.
+            </p>
+          ) : null}
         </section>
 
         <section className="bg-surface rounded-xl shadow-md p-7 min-h-[400px] flex items-center justify-center">

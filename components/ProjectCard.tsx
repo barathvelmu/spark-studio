@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Project, GradientPreset } from "@/lib/types";
-import { getUserById } from "@/lib/mockData";
+import { resolveCreator } from "@/lib/mockData";
 import { ConceptChip } from "./ConceptChip";
 import { SafetyBadge } from "./SafetyBadge";
 import { Chip } from "./ui/Chip";
@@ -31,7 +31,7 @@ export type ProjectCardProps = {
 const MAX_VISIBLE_CONCEPTS = 3;
 
 export function ProjectCard({ project, className = "" }: ProjectCardProps) {
-  const creator = getUserById(project.creatorId);
+  const creator = resolveCreator(project.creatorId);
   const visibleConcepts = project.concepts.slice(0, MAX_VISIBLE_CONCEPTS);
   const overflowCount = project.concepts.length - visibleConcepts.length;
 

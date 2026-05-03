@@ -4,8 +4,10 @@ import { Menu, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { ButtonLink } from "./ui/Button";
+import { Button, ButtonLink } from "./ui/Button";
 import { Modal } from "./ui/Modal";
+import { UserMenu } from "./auth/UserMenu";
+import { useAuth } from "@/lib/auth";
 
 type NavLink = {
   href: string;
@@ -26,9 +28,14 @@ function isActive(pathname: string | null, href: string): boolean {
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { account, isSignedIn, hydrated, requireAuth } = useAuth();
+
+  function openSignIn() {
+    requireAuth({ reason: "sign_in" });
+  }
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[rgba(250,249,245,0.85)] backdrop-blur-md border-b border-border">
+    <header className="sticky top-0 z-40 w-full bg-[rgba(250,250,255,0.85)] backdrop-blur-md border-b border-border">
       <div className="max-w-page mx-auto flex items-center justify-between h-16 px-7 lg:px-9">
         <Link
           href="/"
@@ -63,9 +70,27 @@ export function Header() {
               </Link>
             );
           })}
-          <ButtonLink href="/builder" variant="primary" size="sm" className="ml-2">
-            Start Building
-          </ButtonLink>
+
+          {hydrated && isSignedIn && account ? (
+            <div className="ml-2">
+              <UserMenu />
+            </div>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={openSignIn}
+                className="ml-2"
+              >
+                Sign in
+              </Button>
+              <ButtonLink href="/builder" variant="primary" size="sm">
+                Start Building
+              </ButtonLink>
+            </>
+          )}
         </nav>
 
         <button
@@ -100,6 +125,43 @@ export function Header() {
               </Link>
             );
           })}
+
+          {hydrated && isSignedIn && account ? (
+            <>
+              <Link
+                href={`/u/${account.handle}`}
+                onClick={() => setMobileOpen(false)}
+                className="rounded-md px-4 h-12 inline-flex items-center text-body font-semibold text-text hover:bg-surface-muted transition-colors"
+              >
+                <span className="mr-3 text-xl" aria-hidden="true">
+                  {account.emoji}
+                </span>
+                @{account.handle}
+              </Link>
+              <Link
+                href="/account"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-md px-4 h-12 inline-flex items-center text-body font-semibold text-text hover:bg-surface-muted transition-colors"
+              >
+                Edit profile
+              </Link>
+            </>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              fullWidth
+              className="mt-3"
+              onClick={() => {
+                setMobileOpen(false);
+                openSignIn();
+              }}
+            >
+              Sign in
+            </Button>
+          )}
+
           <ButtonLink
             href="/builder"
             variant="primary"

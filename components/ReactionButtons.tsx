@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { Reaction } from "@/lib/types";
+import { useAuth } from "@/lib/auth";
 
 type ReactionDef = {
   id: Reaction;
@@ -20,12 +21,18 @@ const REACTIONS: ReactionDef[] = [
 
 const COUNTS_KEY = "spark.reactions.counts.v1";
 const MINE_KEY = "spark.reactions.mine.v1";
+const ANON_BUCKET = "__anon__";
 
 type CountMap = Record<string, number>;
 type MineMap = Record<string, true>;
+type MineByAccount = Record<string, MineMap>;
+
+function isBrowser(): boolean {
+  return typeof window !== "undefined";
+}
 
 function loadCounts(): CountMap {
-  if (typeof window === "undefined") return {};
+  if (!isBrowser()) return {};
   try {
     const raw = window.localStorage.getItem(COUNTS_KEY);
     return raw ? (JSON.parse(raw) as CountMap) : {};
@@ -34,18 +41,31 @@ function loadCounts(): CountMap {
   }
 }
 
-function loadMine(): MineMap {
-  if (typeof window === "undefined") return {};
+function isLegacyMine(v: unknown): v is MineMap {
+  if (typeof v !== "object" || v === null || Array.isArray(v)) return false;
+  return Object.values(v as Record<string, unknown>).every((x) => x === true);
+}
+
+function loadMineMap(): MineByAccount {
+  if (!isBrowser()) return {};
   try {
     const raw = window.localStorage.getItem(MINE_KEY);
-    return raw ? (JSON.parse(raw) as MineMap) : {};
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (isLegacyMine(parsed)) {
+      return { [ANON_BUCKET]: parsed };
+    }
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed as MineByAccount;
+    }
+    return {};
   } catch {
     return {};
   }
 }
 
 function persist<T>(key: string, value: T) {
-  if (typeof window === "undefined") return;
+  if (!isBrowser()) return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
@@ -59,42 +79,55 @@ export type ReactionButtonsProps = {
 };
 
 export function ReactionButtons({ projectId, className = "" }: ReactionButtonsProps) {
+  const { account, hydrated, requireAuth } = useAuth();
   const [counts, setCounts] = useState<CountMap>({});
   const [mine, setMine] = useState<MineMap>({});
   const [bumping, setBumping] = useState<string | null>(null);
 
+  const bucket = account?.id ?? ANON_BUCKET;
+
   useEffect(() => {
+    if (!hydrated) return;
     setCounts(loadCounts());
-    setMine(loadMine());
-  }, []);
+    const map = loadMineMap();
+    setMine(map[bucket] ?? {});
+  }, [hydrated, bucket]);
 
   const keyFor = useCallback(
     (reactionId: Reaction) => `${projectId}:${reactionId}`,
     [projectId]
   );
 
-  function toggle(reactionId: Reaction) {
+  function applyToggle(reactionId: Reaction, accountId: string) {
     const k = keyFor(reactionId);
-    setMine((prevMine) => {
-      const isOn = !!prevMine[k];
-      const nextMine: MineMap = { ...prevMine };
-      if (isOn) delete nextMine[k];
-      else nextMine[k] = true;
-      persist(MINE_KEY, nextMine);
+    const map = loadMineMap();
+    const myMap: MineMap = { ...(map[accountId] ?? {}) };
+    const isOn = !!myMap[k];
+    if (isOn) delete myMap[k];
+    else myMap[k] = true;
+    map[accountId] = myMap;
+    persist(MINE_KEY, map);
+    setMine(myMap);
 
-      setCounts((prevCounts) => {
-        const nextCounts: CountMap = { ...prevCounts };
-        const cur = nextCounts[k] ?? 0;
-        nextCounts[k] = Math.max(0, cur + (isOn ? -1 : 1));
-        persist(COUNTS_KEY, nextCounts);
-        return nextCounts;
-      });
-
-      return nextMine;
-    });
+    const nextCounts: CountMap = { ...loadCounts() };
+    const cur = nextCounts[k] ?? 0;
+    nextCounts[k] = Math.max(0, cur + (isOn ? -1 : 1));
+    persist(COUNTS_KEY, nextCounts);
+    setCounts(nextCounts);
 
     setBumping(reactionId);
-    window.setTimeout(() => setBumping((cur) => (cur === reactionId ? null : cur)), 220);
+    window.setTimeout(() => setBumping((c) => (c === reactionId ? null : c)), 220);
+  }
+
+  function toggle(reactionId: Reaction) {
+    if (!account) {
+      requireAuth({
+        reason: "sign_in",
+        onSuccess: (acct) => applyToggle(reactionId, acct.id),
+      });
+      return;
+    }
+    applyToggle(reactionId, account.id);
   }
 
   return (

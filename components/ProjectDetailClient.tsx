@@ -14,7 +14,7 @@ import { LineageView } from "@/components/LineageView";
 import { ConceptChip } from "@/components/ConceptChip";
 import { ReactionButtons } from "@/components/ReactionButtons";
 import { getProject } from "@/lib/projectStore";
-import { getProjectById, getUserById } from "@/lib/mockData";
+import { getProjectById, resolveCreator } from "@/lib/mockData";
 import type { CollectorGameConfig, Project } from "@/lib/types";
 
 type Tab = "play" | "code" | "learn";
@@ -55,7 +55,7 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
     );
   }
 
-  const creator = getUserById(project.creatorId);
+  const creator = resolveCreator(project.creatorId);
 
   const effectiveProject: Project = {
     ...project,
@@ -91,7 +91,13 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
             {creator && (
               <p className="text-body-sm text-text-muted">
                 <span className="mr-1">{creator.emoji}</span>
-                by <strong>@{creator.handle}</strong>
+                by{" "}
+                <Link
+                  href={`/u/${creator.handle}`}
+                  className="font-bold text-text hover:text-primary transition-colors"
+                >
+                  @{creator.handle}
+                </Link>
                 {" · "}
                 <span>🌱 {project.remixCount} remixes</span>
               </p>

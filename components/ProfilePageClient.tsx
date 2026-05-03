@@ -38,8 +38,15 @@ export function ProfilePageClient({ handle }: ProfilePageClientProps) {
   useEffect(() => {
     if (!user) return;
     const all = getAllProjects();
-    setProjects(all.filter((p) => p.creatorId === user.id));
-  }, [user]);
+    const mine = all.filter((p) => p.creatorId === user.id);
+    // On other people's profiles, hide drafts; on your own, show everything
+    // so you can find and publish work you haven't shared yet.
+    const visible =
+      currentAccount && currentAccount.id === user.id
+        ? mine
+        : mine.filter((p) => p.published);
+    setProjects(visible);
+  }, [user, currentAccount]);
 
   useEffect(() => {
     if (!user || !currentAccount || currentAccount.id !== user.id) {

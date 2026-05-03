@@ -36,22 +36,22 @@ export function UserMenu() {
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className={[
-          "inline-flex items-center gap-2 h-10 pl-1 pr-3 rounded-pill transition-all",
+          "inline-flex items-center gap-2 h-9 pl-1 pr-3 rounded-pill border border-border transition-all",
           open
-            ? "bg-primary-soft"
+            ? "bg-primary-soft border-transparent"
             : "bg-surface hover:bg-surface-muted",
         ].join(" ")}
       >
         <span
           aria-hidden="true"
-          className="inline-flex items-center justify-center w-8 h-8 rounded-pill bg-primary-soft text-xl"
+          className="inline-flex items-center justify-center w-7 h-7 rounded-pill bg-primary-soft text-base leading-none overflow-hidden shrink-0"
         >
           {account.emoji}
         </span>
         <span className="text-label font-semibold text-text max-w-[140px] truncate">
           @{account.handle}
         </span>
-        <ChevronDown size={14} strokeWidth={2} className="text-text-muted" />
+        <ChevronDown size={14} strokeWidth={2} className="text-text-muted shrink-0" />
       </button>
 
       {open ? (

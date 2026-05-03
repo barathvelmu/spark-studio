@@ -5,12 +5,23 @@ import { projects as seedProjects, getProjectById as seedGet } from "./mockData"
 
 const STORAGE_KEY = "spark.projects.v1";
 
+const seedIds = new Set(seedProjects.map((p) => p.id));
+
+// Older stored rows may pre-date the `published` field. Treat seed ids as
+// published (since we ship them on Discover) and user-created rows as drafts
+// until they explicitly publish.
+function normalize(project: Project): Project {
+  if (typeof project.published === "boolean") return project;
+  return { ...project, published: seedIds.has(project.id) };
+}
+
 function loadFromStorage(): Project[] | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as Project[];
+    const parsed = JSON.parse(raw) as Project[];
+    return parsed.map(normalize);
   } catch {
     return null;
   }
@@ -69,12 +80,22 @@ export function remixProject(parentId: string, overrides: Partial<Project> & { c
     forkedFromProjectId: parent.id,
     createdAt: new Date().toISOString(),
     remixCount: 0,
+    published: false,
   };
   saveProject(child);
   // bump parent remix count
   const parentUpdated: Project = { ...parent, remixCount: parent.remixCount + 1 };
   saveProject(parentUpdated);
   return child;
+}
+
+export function publishProject(id: string): Project | undefined {
+  const project = getProject(id);
+  if (!project) return undefined;
+  if (project.published) return project;
+  const updated: Project = { ...project, published: true };
+  saveProject(updated);
+  return updated;
 }
 
 export function clearStore(): void {

@@ -188,6 +188,7 @@ export const projects: Project[] = [
     remixCount: 12,
     createdAt: "2026-05-03T12:00:00.000Z",
     gradient: "sky",
+    published: true,
   },
   {
     id: "p_space_junk",
@@ -220,6 +221,7 @@ export const projects: Project[] = [
     remixCount: 4,
     createdAt: "2026-05-03T12:30:00.000Z",
     gradient: "indigo",
+    published: true,
   },
   {
     id: "p_climate_quiz",
@@ -255,6 +257,7 @@ export const projects: Project[] = [
     remixCount: 7,
     createdAt: "2026-05-03T11:00:00.000Z",
     gradient: "mint",
+    published: true,
   },
   {
     id: "p_kindness_quest",
@@ -290,6 +293,7 @@ export const projects: Project[] = [
     remixCount: 3,
     createdAt: "2026-05-03T10:00:00.000Z",
     gradient: "peach",
+    published: true,
   },
   {
     id: "p_dragon_star",
@@ -316,6 +320,7 @@ export const projects: Project[] = [
     remixCount: 9,
     createdAt: "2026-05-03T09:00:00.000Z",
     gradient: "lavender",
+    published: true,
   },
 ];
 

@@ -1,5 +1,8 @@
 # tasks.md — Spark Studio Hackathon
 
+> **Hackathon execution plan, frozen at kickoff.** Split work between Barath (Spine: Builder, Project Detail, templates, Code/Ask/Tinker, API routes) and Ashrit (Surrounds: design system, Landing, Discover, cards, auth, publish). Most must-ship items shipped; many stretch items did too. For the final state, see [`README.md`](./README.md).
+
+
 > **Pitch lead:** Every AI-generated change becomes a learning moment.
 > **Demo path:** Idea Wall → click Ocean Cleanup → generate → Play → Code → Ask "how does score work?" → Remix to Space Junk → show "Forked from" → Learn tab → Publish.
 > **Must-ship:** demo path works end-to-end with mock data + CollectorGame.

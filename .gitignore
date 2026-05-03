@@ -24,3 +24,6 @@ pnpm-debug.log*
 .vscode/
 .idea/
 *.swp
+
+# TypeScript incremental build cache
+*.tsbuildinfo

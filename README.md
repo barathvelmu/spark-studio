@@ -13,7 +13,7 @@ Built at Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackat
 You give it an idea ("a turtle that collects plastic from the ocean") and it builds you a working mini-game in a few seconds. The important part: it doesn't hide the code. Every project has four tabs.
 
 - **Play.** The actual interactive thing. A collector game, a quiz, or a branching choose-your-own-adventure story.
-- **Code.** Real, hand-written `index.html`, `style.css`, and `game.js` you can read, copy, and run anywhere.
+- **Code.** Real, beginner-friendly `index.html`, `style.css`, and `game.js` you can read, copy, and run anywhere.
 - **Ask the code.** A chat that's grounded in *that specific project's source*. "How does the score work?" "What does Math.abs do?" Claude answers in plain English and highlights the exact lines it's talking about.
 - **Learn.** What changed, what concepts the code teaches (variables, events, conditionals, loops, branching, state), and what to try next.
 
@@ -32,7 +32,7 @@ Most AI coding tools are built for adults who already know what a repository or 
 1. Open the Idea Wall and click "Build this" on Ocean Cleanup Game.
 2. Spark Studio auto-generates a playable turtle-collects-plastic game. (Claude shapes the title, theme, and copy. The React template renders it.)
 3. Hit Play. Click anywhere or use arrow keys. Collect 10 plastic bottles to win.
-4. Open the Code tab. Read the actual hand-written HTML, CSS, and JS that the game runs on.
+4. Open the Code tab. Read the actual beginner-friendly HTML, CSS, and JS that the game runs on.
 5. Open Ask the code. Ask "How does the score work?" Get a kid-friendly answer with the relevant lines highlighted.
 6. Try Tinker Mode. Click "Suggest a tinker." Claude proposes something safe like "Make the turtle faster." Click Apply and watch the line change.
 7. Hit Remix. Type "Make it about space junk instead." A new project appears with a "Forked from Ocean Cleanup Game" lineage chip and a branching tree.
@@ -88,7 +88,7 @@ components/
   LineageTree.tsx           Walks forkedFromProjectId up to root, scans for direct children, cycle-safe
 lib/
   types.ts                  Project, Idea, User, Concept, ProjectConfig union
-  mockData.ts               5 seeded projects with hand-written code strings
+  mockData.ts               5 seeded projects with beginner-friendly code strings
   templateGenerator.ts      Keyword theme picker + parameterized makeCollectorCode
   projectStore.ts           localStorage CRUD with seed fallback and the publish flow
   auth.tsx                  Auth context, with deferred onSuccess callbacks for the new-user gate
@@ -110,7 +110,7 @@ scripts/
 
 **Template-based generation, not free-form code generation.** Claude shapes config (player emoji, collectible, theme, copy) and a deterministic React template renders the game. That way the live preview stays rock-solid even when the model occasionally returns malformed JSON or refuses a prompt.
 
-**Hand-written code in the Code tab, not the React source.** The HTML, CSS, and JS displayed in the Code tab is real, runnable code that mirrors what the React template does. Kids can copy it into a folder and open it in any browser. It also gives Ask the Code real line numbers to point at, instead of pseudo-code.
+**Beginner-friendly code in the Code tab, not the React source.** The HTML, CSS, and JS displayed in the Code tab is real, runnable code that mirrors what the React template does. Kids can copy it into a folder and open it in any browser. It also gives Ask the Code real line numbers to point at, instead of pseudo-code.
 
 **Mock fallback on every Claude route.** Network blip, missing API key, malformed model output, refusal: every route silently falls back to deterministic mocks. The demo path never breaks. Real Claude is the upgrade, not the dependency.
 
@@ -120,15 +120,11 @@ scripts/
 
 ## Status
 
-We built this in the 2-hour hack window (1–3 PM, Stata 32-141, May 3, 2026) for Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackathon. The schedule was tight: opening ceremony and track reveal at 12:30, hack from 1 to 3, demo videos due at 3 for judging. The theme came from Dario Amodei's [essay](https://www.darioamodei.com/essay/machines-of-loving-grace) of the same name, which challenged teams to build something that moves the needle toward a more humane world. Our angle: getting kids who don't have access to advanced CS classes, mentors, or expensive tools to participate as creators of AI-assisted software, not just consumers, and to actually learn the underlying concepts as they go.
-
-Two hours is the reason a lot of the architecture looks the way it does. Template-based generation instead of free-form code generation. Hand-written code strings instead of AI-generated source. Mock fallbacks on every Claude route so a network blip can't break the demo. Pre-build planning documents (the `docs/00`–`05` files) written before kickoff so the team could split work the moment the clock started. Two hours forces good decisions.
-
-There's a small bit of MIT lineage threaded through the project too. Scratch was born at the MIT Media Lab's Lifelong Kindergarten group, so asking "what would Scratch look like for the AI-native generation?" feels right when the question is asked at the place where Scratch began.
+Built in the 2-hour hack window (1–3 PM, Stata 32-141, May 3, 2026). The whole thing was built with Claude Code, paired with a lot of pre-build planning (the `docs/00`–`05` files were written before kickoff so we could split work the moment the clock started). Honestly stoked we got the full demo path working in two hours.
 
 The full demo path works end-to-end on a fresh clone with an Anthropic key. The production build is clean (`npm run build`), typecheck is clean (`npm run typecheck`), and a scripted smoke test (`bash scripts/e2e.sh`) covers all 5 page routes, all 4 API routes, and the rendered demo strings.
 
-Things that would be the next features in a hosted version: a real database (Supabase or similar), real email delivery for the auth code, Tinker Mode history, search and filter on Discover, and an animated branching lineage view.
+Things we'd add in a hosted version: a real database (Supabase or similar), real email delivery for the auth code, Tinker Mode history, search and filter on Discover, and an animated branching lineage view.
 
 ## Credits
 

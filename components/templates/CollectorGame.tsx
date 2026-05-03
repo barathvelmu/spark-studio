@@ -67,11 +67,17 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
     }
   }, [player, collectible]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
+  // Global keyboard listener so the game works regardless of focus.
+  // The kid can just press arrow keys without clicking the play area first.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
       if (score >= WIN_SCORE) return;
       const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
       if (!keys.includes(e.key)) return;
+      // Only intercept arrows when not typing in an input/textarea.
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
       e.preventDefault();
       setPlayer((prev) => {
         let { x, y } = prev;
@@ -83,8 +89,18 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
         y = Math.max(0, Math.min(PLAY_HEIGHT - EMOJI_SIZE, y));
         return { x, y };
       });
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [score]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // Local keydown still attached for focus-ring + a11y; movement handled globally above.
+      const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+      if (keys.includes(e.key)) e.preventDefault();
     },
-    [score],
+    [],
   );
 
   const reset = useCallback(() => {

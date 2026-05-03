@@ -41,9 +41,6 @@ function emailLooksValid(email: string): boolean {
 }
 
 export function AuthModal() {
-  // #region agent log
-  if (typeof window !== 'undefined') { fetch('http://127.0.0.1:7394/ingest/23981fe7-6960-4080-92f1-749112831cbd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'747a76'},body:JSON.stringify({sessionId:'747a76',hypothesisId:'A',location:'AuthModal.tsx:render',message:'AuthModal render',data:{},timestamp:Date.now()})}).catch(()=>{}); }
-  // #endregion
   const auth = useAuth();
   const toast = useToast();
 
@@ -262,12 +259,7 @@ function EmailStep({
         label="Email"
         placeholder="you@example.com"
         value={email}
-        onChange={(e) => {
-          // #region agent log
-          fetch('http://127.0.0.1:7394/ingest/23981fe7-6960-4080-92f1-749112831cbd',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'747a76'},body:JSON.stringify({sessionId:'747a76',hypothesisId:'C',location:'AuthModal.tsx:emailChange',message:'email onChange fired',data:{valueLen:e.target.value.length,activeElLabel:(document.activeElement as HTMLElement)?.getAttribute('aria-label'),activeElTag:(document.activeElement as HTMLElement)?.tagName},timestamp:Date.now()})}).catch(()=>{});
-          // #endregion
-          onEmail(e.target.value);
-        }}
+        onChange={(e) => onEmail(e.target.value)}
         error={error}
         helper="We only use this to send your sign-in code. No spam."
       />

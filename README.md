@@ -10,7 +10,7 @@ Built at Claude Builders @ MIT's *Machines of Loving Grace* Spring Sprint Hackat
 
 ## What it does
 
-You give it an idea ("a turtle that collects plastic from the ocean") and it builds you a working mini-game in a few seconds. The important part: it doesn't hide the code. Every project has four tabs.
+You give it an idea ("a turtle that collects plastic from the ocean") and it builds you a working mini-game in a few seconds. The thing we wanted to get right: it doesn't hide the code. Every project has four tabs.
 
 - **Play.** The actual interactive thing. A collector game, a quiz, or a branching choose-your-own-adventure story.
 - **Code.** Real, beginner-friendly `index.html`, `style.css`, and `game.js` you can read, copy, and run anywhere.
@@ -25,7 +25,7 @@ The whole thing sits behind passwordless auth (auto-generated kid-friendly handl
 
 Scratch made coding accessible by making it creative, visual, and remixable. Spark Studio asks: what would Scratch look like if it were designed for the AI-native generation?
 
-Most AI coding tools are built for adults who already know what a repository or a deploy is. Spark Studio is built for an 11-year-old with an idea and no prior coding experience. The whole point is that AI shouldn't just generate code for kids; it should help them create, look at it, ask about it, remix it, and understand it. Spark Studio teaches them as they build, instead of hiding the syntax behind a black box.
+Most AI coding tools assume you already know what a repository or a deploy is. We wanted something an 11-year-old with an idea and no prior coding experience could pick up. So Spark Studio doesn't just generate the code, it shows the code, lets you ask about it, lets you remix it, and tries to teach the concepts as you build.
 
 ## Demo path
 
@@ -112,7 +112,7 @@ scripts/
 
 **Beginner-friendly code in the Code tab, not the React source.** The HTML, CSS, and JS displayed in the Code tab is real, runnable code that mirrors what the React template does. Kids can copy it into a folder and open it in any browser. It also gives Ask the Code real line numbers to point at, instead of pseudo-code.
 
-**Mock fallback on every Claude route.** Network blip, missing API key, malformed model output, refusal: every route silently falls back to deterministic mocks. The demo path never breaks. Real Claude is the upgrade, not the dependency.
+**Mock fallback on every Claude route.** Network blip, missing API key, malformed model output, refusal: every route silently falls back to deterministic mocks. The demo path never breaks.
 
 **Synchronous localStorage data layer.** No backend DB. The auth flow is passwordless email plus a 6-digit demo code shown directly in the modal (clearly labeled as demo mode). Anonymous projects migrate cleanly into the user's account on first sign-in. The whole thing is designed so that swapping in a real DB later is a one-file change to `projectStore.ts`.
 

@@ -1,0 +1,234 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
+import type { CodeFile } from "@/components/CodeView";
+import { CodeView } from "@/components/CodeView";
+import { CollectorGame } from "@/components/templates/CollectorGame";
+import { AskTheCodePanel } from "@/components/AskTheCodePanel";
+import { RemixModal } from "@/components/RemixModal";
+import { getProject } from "@/lib/projectStore";
+import { getProjectById, getUserById } from "@/lib/mockData";
+import type { CollectorGameConfig, Project } from "@/lib/types";
+
+type Tab = "play" | "code" | "learn";
+
+export function ProjectDetailClient({ projectId }: { projectId: string }) {
+  // Initialize from seed (SSR-safe). useEffect then overrides with any localStorage version.
+  const [project, setProject] = useState<Project | undefined>(() => getProjectById(projectId));
+  const [tab, setTab] = useState<Tab>("play");
+  const [activeFile, setActiveFile] = useState<CodeFile>("js");
+  const [highlight, setHighlight] = useState<{ file: CodeFile; lines: number[] } | undefined>(undefined);
+  const [remixOpen, setRemixOpen] = useState(false);
+
+  useEffect(() => {
+    const stored = getProject(projectId);
+    if (stored) setProject(stored);
+  }, [projectId]);
+
+  if (!project) {
+    return (
+      <div className="max-w-page mx-auto px-7 lg:px-9 py-11">
+        <div className="bg-surface rounded-xl shadow-md p-9 text-center">
+          <div className="text-6xl mb-4">🤔</div>
+          <h1 className="font-display text-h2 mb-2">We couldn't find that project.</h1>
+          <p className="text-body text-text-muted mb-6">It might have been removed, or the link is off.</p>
+          <Link
+            href="/discover"
+            className="inline-flex items-center bg-primary hover:bg-primary-hover text-white font-bold rounded-lg h-12 px-6 shadow-md transition-all"
+          >
+            Back to Discover
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const creator = getUserById(project.creatorId);
+  const parent = project.forkedFromProjectId ? getProjectById(project.forkedFromProjectId) : undefined;
+
+  return (
+    <div className="max-w-page mx-auto px-7 lg:px-9 py-11">
+      {/* Header */}
+      <header className="mb-8">
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <span className="inline-flex items-center gap-1 rounded-pill bg-success-soft text-success font-semibold text-tiny px-3 h-6">
+            <ShieldCheck size={14} strokeWidth={2} />
+            Safety checked
+          </span>
+          {parent && (
+            <span className="inline-flex items-center gap-1 rounded-pill bg-surface-muted text-text-muted font-semibold text-tiny px-3 h-6">
+              🔁 Forked from{" "}
+              <Link href={`/project/${parent.id}`} className="text-primary hover:underline ml-1">
+                {parent.title}
+              </Link>
+            </span>
+          )}
+        </div>
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div>
+            <h1 className="font-display text-h1 mb-2">{project.title}</h1>
+            <p className="text-body text-text-muted max-w-2xl mb-3">{project.description}</p>
+            {creator && (
+              <p className="text-body-sm text-text-muted">
+                <span className="mr-1">{creator.emoji}</span>
+                by <strong>@{creator.handle}</strong>
+                {" · "}
+                <span>🌱 {project.remixCount} remixes</span>
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setRemixOpen(true)}
+            className="bg-primary hover:bg-primary-hover text-white font-bold rounded-lg h-12 px-6 shadow-md transition-all"
+          >
+            🔁 Remix this
+          </button>
+        </div>
+      </header>
+
+      {/* Tabs */}
+      <div className="bg-surface-muted rounded-pill p-1 inline-flex mb-6">
+        {(["play", "code", "learn"] as Tab[]).map((t) => {
+          const active = tab === t;
+          return (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={
+                "rounded-pill px-5 h-10 text-label font-semibold transition-all capitalize " +
+                (active ? "bg-surface shadow-sm text-text" : "text-text-muted hover:text-text")
+              }
+            >
+              {t}
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === "play" && <PlayTab project={project} />}
+      {tab === "code" && (
+        <CodeTab
+          project={project}
+          activeFile={activeFile}
+          onActiveFile={setActiveFile}
+          highlight={highlight}
+          onHighlight={setHighlight}
+        />
+      )}
+      {tab === "learn" && <LearnTab project={project} />}
+
+      <RemixModal parent={project} open={remixOpen} onClose={() => setRemixOpen(false)} />
+    </div>
+  );
+}
+
+function PlayTab({ project }: { project: Project }) {
+  if (project.projectType === "collector_game") {
+    return (
+      <div className="bg-surface rounded-xl shadow-md p-7">
+        <CollectorGame config={project.config as CollectorGameConfig} />
+      </div>
+    );
+  }
+  return (
+    <div className="bg-surface rounded-xl shadow-md p-9 text-center">
+      <div className="text-5xl mb-4">🚧</div>
+      <p className="text-body text-text-muted">This template is coming soon. For now check the Code and Learn tabs.</p>
+    </div>
+  );
+}
+
+function CodeTab({
+  project,
+  activeFile,
+  onActiveFile,
+  highlight,
+  onHighlight,
+}: {
+  project: Project;
+  activeFile: CodeFile;
+  onActiveFile: (f: CodeFile) => void;
+  highlight: { file: CodeFile; lines: number[] } | undefined;
+  onHighlight: (h: { file: CodeFile; lines: number[] }) => void;
+}) {
+  return (
+    <div className="grid lg:grid-cols-[1fr_400px] gap-6">
+      <div className="bg-surface rounded-xl shadow-md p-6">
+        <CodeView
+          codeHtml={project.codeHtml}
+          codeCss={project.codeCss}
+          codeJs={project.codeJs}
+          activeFile={activeFile}
+          onActiveFileChange={onActiveFile}
+          highlightLines={highlight}
+          onAskAboutLine={(file, line) => {
+            onHighlight({ file, lines: [line] });
+          }}
+        />
+      </div>
+      <AskTheCodePanel
+        project={project}
+        onLookHere={(file, lines) => {
+          onActiveFile(file);
+          onHighlight({ file, lines });
+        }}
+      />
+    </div>
+  );
+}
+
+const conceptColors: Record<string, string> = {
+  variables: "bg-primary-soft text-primary",
+  events: "bg-highlight-soft text-[#A16207]",
+  conditionals: "bg-success-soft text-success",
+  loops: "bg-accent-soft text-accent",
+  arrays: "bg-accent-soft text-accent",
+  branching: "bg-[#CCFBF1] text-[#0F766E]",
+  state: "bg-[#F3E8FF] text-[#7C3AED]",
+  score: "bg-[#FFEDD5] text-[#C2410C]",
+  collision: "bg-[#F3E8FF] text-[#7C3AED]",
+};
+
+function LearnTab({ project }: { project: Project }) {
+  return (
+    <div className="grid lg:grid-cols-2 gap-6">
+      <section className="bg-surface rounded-xl shadow-md p-7">
+        <h2 className="font-display text-h3 mb-3">What changed</h2>
+        <ul className="space-y-2 text-body">
+          {project.changeSummary.map((c, i) => (
+            <li key={i} className="flex gap-2">
+              <span className="text-success">✓</span>
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="bg-surface rounded-xl shadow-md p-7">
+        <h2 className="font-display text-h3 mb-3">Concepts</h2>
+        <div className="flex flex-wrap gap-2 mb-5">
+          {project.concepts.map((c) => (
+            <span
+              key={c}
+              className={"rounded-pill px-3 h-7 inline-flex items-center text-tiny font-semibold capitalize " + (conceptColors[c] ?? "bg-surface-muted text-text-muted")}
+            >
+              {c}
+            </span>
+          ))}
+        </div>
+        <p className="text-body text-text">{project.learningSummary}</p>
+      </section>
+
+      <section className="bg-primary-soft rounded-xl p-7 lg:col-span-2">
+        <h2 className="font-display text-h3 mb-2">Next challenge</h2>
+        <p className="text-body text-text">{project.nextChallenge}</p>
+      </section>
+    </div>
+  );
+}
+
+export default ProjectDetailClient;

@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getIdeaById } from "@/lib/mockData";
 import { generateProjectDraft } from "@/lib/templateGenerator";
 import { createProject } from "@/lib/projectStore";
+import { Button } from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/Textarea";
 import type { ProjectType } from "@/lib/types";
 
 type SelectableType = "auto" | "collector_game" | "quiz_game" | "story";
@@ -82,15 +84,11 @@ function BuilderInner() {
 
       <div className="grid lg:grid-cols-[360px_1fr] gap-7">
         <section className="bg-surface rounded-xl shadow-md p-7">
-          <label className="block text-body-sm font-semibold mb-2" htmlFor="builder-prompt">
-            Your idea
-          </label>
-          <textarea
-            id="builder-prompt"
+          <Textarea
+            label="Your idea"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="A turtle collects plastic from the ocean…"
-            className="w-full min-h-[120px] bg-surface-muted rounded-md p-4 text-body resize-y focus:bg-surface focus:outline-none border-[1.5px] border-transparent focus:border-primary transition-colors"
             disabled={isBuilding}
           />
 
@@ -118,14 +116,18 @@ function BuilderInner() {
             })}
           </div>
 
-          <button
+          <Button
             type="button"
             onClick={handleGenerate}
-            disabled={isBuilding || !prompt.trim()}
-            className="mt-7 w-full bg-primary hover:bg-primary-hover text-white font-bold rounded-lg h-12 shadow-md disabled:bg-text-subtle disabled:shadow-none transition-all"
+            disabled={!prompt.trim()}
+            isLoading={isBuilding}
+            variant="primary"
+            size="lg"
+            fullWidth
+            className="mt-7"
           >
             {isBuilding ? "Building your project…" : "Generate"}
-          </button>
+          </Button>
         </section>
 
         <section className="bg-surface rounded-xl shadow-md p-7 min-h-[400px] flex items-center justify-center">

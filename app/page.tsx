@@ -163,7 +163,7 @@ export default function LandingPage() {
   return (
     <div className="relative">
       {/* Full-page animated orbs */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         {BG_ORBS.map((orb, i) => (
           <div
             key={i}
@@ -183,12 +183,12 @@ export default function LandingPage() {
       </div>
 
       {/* Full-page floating emoji particles */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         {BG_PARTICLES.map((p, i) => (
           <span
             key={i}
             className={[
-              "absolute select-none hero-float opacity-70 drop-shadow-sm",
+              "absolute select-none hero-float opacity-90 drop-shadow-md",
               p.hideMobile ? "hidden md:inline-block" : "inline-block",
             ].join(" ")}
             style={{
@@ -205,15 +205,20 @@ export default function LandingPage() {
         ))}
       </div>
 
-      <div className="max-w-page mx-auto px-7 lg:px-9">
+      <div className="relative z-10 max-w-page mx-auto px-7 lg:px-9">
       {/* Hero */}
       <HeroBanner />
 
       {/* How it works */}
       <section className="py-9" aria-labelledby="how-it-works">
-        <h2 id="how-it-works" className="font-display text-h2 text-text text-center mb-6">
+        <h2 id="how-it-works" className="font-display text-h2 text-text text-center mb-3">
           How it works
         </h2>
+        <p className="text-body text-text-subtle text-center mb-7 leading-relaxed">
+          Create stories, games, and animations
+          <br />
+          Share with others around the world!
+        </p>
 
         <ol
           className="flex items-start justify-between gap-3 max-w-3xl mx-auto overflow-x-auto md:overflow-visible pb-2 list-none"

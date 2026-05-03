@@ -34,21 +34,35 @@ export function Modal({
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  // Keep onClose ref fresh without retriggering the focus-trap effect.
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
 
     previouslyFocused.current = document.activeElement as HTMLElement | null;
     const dialog = dialogRef.current;
-    const focusable = dialog?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    );
-    // Prefer the first text input or textarea over the X close button (which is first in DOM order).
-    // Falls back to the first focusable if no input/textarea exists.
+
+    // Prefer focusing the first form field; fall back to first non-Close button.
     const firstField = dialog?.querySelector<HTMLElement>(
-      'input:not([disabled]):not([type="hidden"]), textarea:not([disabled])'
+      'input:not([disabled]), textarea:not([disabled]), select:not([disabled])'
     );
-    (firstField ?? focusable?.[0])?.focus();
+    let initialTarget: HTMLElement | undefined = firstField ?? undefined;
+    if (!initialTarget) {
+      const buttons = dialog?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (buttons) {
+        initialTarget =
+          Array.from(buttons).find((el) => el.getAttribute("aria-label") !== "Close") ??
+          buttons[0];
+      }
+    }
+    initialTarget?.focus();
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -56,10 +70,15 @@ export function Modal({
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         e.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
-      if (e.key === "Tab" && focusable && focusable.length > 0) {
+      if (e.key === "Tab") {
+        // Re-query each time so we don't trap against stale DOM.
+        const focusable = dialog?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable || focusable.length === 0) return;
         const first = focusable[0];
         const last = focusable[focusable.length - 1];
         if (e.shiftKey && document.activeElement === first) {
@@ -78,7 +97,7 @@ export function Modal({
       document.body.style.overflow = prevOverflow;
       previouslyFocused.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
   if (typeof window === "undefined") return null;
@@ -110,9 +129,9 @@ export function Modal({
           type="button"
           aria-label="Close"
           onClick={onClose}
-          className="absolute top-4 right-4 inline-flex items-center justify-center w-10 h-10 rounded-md text-text-muted hover:bg-surface-muted hover:text-text transition-colors"
+          className="absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-md text-text-muted hover:bg-surface-muted hover:text-text transition-colors"
         >
-          <X size={20} strokeWidth={1.75} />
+          <X size={16} strokeWidth={1.75} />
         </button>
         <div className="text-body text-text">{children}</div>
         {footer ? <div className="flex items-center justify-end gap-3 mt-8">{footer}</div> : null}

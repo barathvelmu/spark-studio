@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
 import type { CodeFile } from "@/components/CodeView";
 import { CodeView } from "@/components/CodeView";
 import { CollectorGame } from "@/components/templates/CollectorGame";
 import { AskTheCodePanel } from "@/components/AskTheCodePanel";
 import { RemixModal } from "@/components/RemixModal";
+import { SafetyBadge } from "@/components/SafetyBadge";
+import { LineageView } from "@/components/LineageView";
+import { ConceptChip } from "@/components/ConceptChip";
+import { ReactionButtons } from "@/components/ReactionButtons";
 import { getProject } from "@/lib/projectStore";
 import { getProjectById, getUserById } from "@/lib/mockData";
 import type { CollectorGameConfig, Project } from "@/lib/types";
@@ -46,25 +49,14 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
   }
 
   const creator = getUserById(project.creatorId);
-  const parent = project.forkedFromProjectId ? getProjectById(project.forkedFromProjectId) : undefined;
 
   return (
     <div className="max-w-page mx-auto px-7 lg:px-9 py-11">
       {/* Header */}
       <header className="mb-8">
         <div className="flex flex-wrap items-center gap-3 mb-3">
-          <span className="inline-flex items-center gap-1 rounded-pill bg-success-soft text-success font-semibold text-tiny px-3 h-6">
-            <ShieldCheck size={14} strokeWidth={2} />
-            Safety checked
-          </span>
-          {parent && (
-            <span className="inline-flex items-center gap-1 rounded-pill bg-surface-muted text-text-muted font-semibold text-tiny px-3 h-6">
-              🔁 Forked from{" "}
-              <Link href={`/project/${parent.id}`} className="text-primary hover:underline ml-1">
-                {parent.title}
-              </Link>
-            </span>
-          )}
+          <SafetyBadge />
+          <LineageView forkedFromProjectId={project.forkedFromProjectId} />
         </div>
         <div className="flex items-start justify-between gap-6 flex-wrap">
           <div>
@@ -181,18 +173,6 @@ function CodeTab({
   );
 }
 
-const conceptColors: Record<string, string> = {
-  variables: "bg-primary-soft text-primary",
-  events: "bg-highlight-soft text-[#A16207]",
-  conditionals: "bg-success-soft text-success",
-  loops: "bg-accent-soft text-accent",
-  arrays: "bg-accent-soft text-accent",
-  branching: "bg-[#CCFBF1] text-[#0F766E]",
-  state: "bg-[#F3E8FF] text-[#7C3AED]",
-  score: "bg-[#FFEDD5] text-[#C2410C]",
-  collision: "bg-[#F3E8FF] text-[#7C3AED]",
-};
-
 function LearnTab({ project }: { project: Project }) {
   return (
     <div className="grid lg:grid-cols-2 gap-6">
@@ -212,12 +192,7 @@ function LearnTab({ project }: { project: Project }) {
         <h2 className="font-display text-h3 mb-3">Concepts</h2>
         <div className="flex flex-wrap gap-2 mb-5">
           {project.concepts.map((c) => (
-            <span
-              key={c}
-              className={"rounded-pill px-3 h-7 inline-flex items-center text-tiny font-semibold capitalize " + (conceptColors[c] ?? "bg-surface-muted text-text-muted")}
-            >
-              {c}
-            </span>
+            <ConceptChip key={c} concept={c} />
           ))}
         </div>
         <p className="text-body text-text">{project.learningSummary}</p>
@@ -225,7 +200,8 @@ function LearnTab({ project }: { project: Project }) {
 
       <section className="bg-primary-soft rounded-xl p-7 lg:col-span-2">
         <h2 className="font-display text-h3 mb-2">Next challenge</h2>
-        <p className="text-body text-text">{project.nextChallenge}</p>
+        <p className="text-body text-text mb-5">{project.nextChallenge}</p>
+        <ReactionButtons projectId={project.id} />
       </section>
     </div>
   );

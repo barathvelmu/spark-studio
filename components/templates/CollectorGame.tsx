@@ -96,11 +96,29 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      // Local keydown still attached for focus-ring + a11y; movement handled globally above.
       const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
       if (keys.includes(e.key)) e.preventDefault();
     },
     [],
+  );
+
+  // Click anywhere in the play area to move the player there.
+  // Works as the universal "play" gesture — no keyboard required.
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (score >= WIN_SCORE) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      // Map click position from on-screen pixels to logical play-area pixels
+      // (the play area scales down on small screens via aspectRatio).
+      const scaleX = PLAY_WIDTH / rect.width;
+      const scaleY = PLAY_HEIGHT / rect.height;
+      const localX = (e.clientX - rect.left) * scaleX;
+      const localY = (e.clientY - rect.top) * scaleY;
+      const targetX = Math.max(0, Math.min(PLAY_WIDTH - EMOJI_SIZE, localX - EMOJI_SIZE / 2));
+      const targetY = Math.max(0, Math.min(PLAY_HEIGHT - EMOJI_SIZE, localY - EMOJI_SIZE / 2));
+      setPlayer({ x: targetX, y: targetY });
+    },
+    [score],
   );
 
   const reset = useCallback(() => {
@@ -125,9 +143,10 @@ export function CollectorGame({ config }: { config: CollectorGameConfig }) {
         ref={playAreaRef}
         tabIndex={0}
         onKeyDown={handleKeyDown}
+        onClick={handleClick}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className="relative w-full max-w-[600px] rounded-xl overflow-hidden outline-none focus:ring-4 focus:ring-primary/40"
+        className="relative w-full max-w-[600px] rounded-xl overflow-hidden outline-none focus:ring-4 focus:ring-primary/40 cursor-pointer"
         style={{
           height: PLAY_HEIGHT,
           aspectRatio: `${PLAY_WIDTH} / ${PLAY_HEIGHT}`,

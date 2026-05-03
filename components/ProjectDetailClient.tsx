@@ -254,7 +254,7 @@ function CodeTab({
   applyEdit: (file: TinkerFile, before: string, after: string) => void;
 }) {
   return (
-    <div className="grid lg:grid-cols-[1fr_400px] gap-6">
+    <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6">
       <div className="space-y-6">
         <div className="bg-surface rounded-xl shadow-md p-6">
           <CodeView

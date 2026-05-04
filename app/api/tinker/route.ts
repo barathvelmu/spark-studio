@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { askClaudeJson, isAnthropicConfigured } from "@/lib/gemini";
+import { askClaudeJson, isAnthropicConfigured } from "@/lib/groq";
 import { getProjectById } from "@/lib/mockData";
 import { pickTinkerSuggestion, type TinkerSuggestion } from "@/lib/tinker";
 import type { Project } from "@/lib/types";

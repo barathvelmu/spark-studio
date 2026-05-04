@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { askClaudeJson, isAnthropicConfigured } from "@/lib/gemini";
+import { askClaudeJson, isAnthropicConfigured } from "@/lib/groq";
 import { getProjectById, oceanCleanupAskAnswers, suggestedAskQuestions } from "@/lib/mockData";
 
 export const runtime = "nodejs";

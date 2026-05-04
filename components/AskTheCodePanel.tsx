@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { suggestedAskQuestions } from "@/lib/mockData";
 import type { Project } from "@/lib/types";
 
 type Message = { role: "user" | "assistant"; text: string };
+
+export type AskTheCodePanelHandle = {
+  ask: (question: string) => void;
+};
 
 type AskTheCodePanelProps = {
   project: Project;
@@ -18,12 +22,15 @@ type AskResponse = {
   highlightLines?: { file: "html" | "css" | "js"; lines: number[] };
 };
 
-export function AskTheCodePanel({ project, onLookHere }: AskTheCodePanelProps) {
+export const AskTheCodePanel = forwardRef<AskTheCodePanelHandle, AskTheCodePanelProps>(
+function AskTheCodePanel({ project, onLookHere }, ref) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [suggested, setSuggested] = useState<string[]>(suggestedAskQuestions);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({ ask }));
 
   useEffect(() => {
     // Reset chat + suggestions when switching projects.
@@ -166,6 +173,6 @@ export function AskTheCodePanel({ project, onLookHere }: AskTheCodePanelProps) {
       </form>
     </aside>
   );
-}
+});
 
 export default AskTheCodePanel;

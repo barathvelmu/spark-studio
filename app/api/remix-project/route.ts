@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateRemixDraft, makeCollectorCode, type ProjectDraft } from "@/lib/templateGenerator";
-import { askClaudeJson, isAnthropicConfigured } from "@/lib/anthropic";
+import { askClaudeJson, isAnthropicConfigured } from "@/lib/gemini";
 import { getProjectById } from "@/lib/mockData";
 import type { CollectorGameConfig, GradientPreset, Project } from "@/lib/types";
 

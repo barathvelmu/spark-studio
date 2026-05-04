@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateProjectDraft, makeCollectorCode, type ProjectDraft } from "@/lib/templateGenerator";
-import { askClaudeJson, isAnthropicConfigured } from "@/lib/anthropic";
+import { askClaudeJson, isAnthropicConfigured } from "@/lib/gemini";
 import type { CollectorGameConfig, GradientPreset, ProjectType } from "@/lib/types";
 
 export const runtime = "nodejs";

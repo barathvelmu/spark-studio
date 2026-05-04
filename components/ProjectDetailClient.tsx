@@ -190,7 +190,12 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
         })}
       </div>
 
-      {tab === "play" && <PlayTab project={effectiveProject} />}
+      {tab === "play" && (
+        <PlayTab
+          project={effectiveProject}
+          hasTinkered={Object.keys(tinkered).length > 0}
+        />
+      )}
       {tab === "code" && (
         <CodeTab
           project={effectiveProject}
@@ -208,7 +213,31 @@ export function ProjectDetailClient({ projectId }: { projectId: string }) {
   );
 }
 
-function PlayTab({ project }: { project: Project }) {
+function buildIframeDoc(project: Project): string {
+  return project.codeHtml
+    .replace(/<link[^>]+href="style\.css"[^>]*\/?>/i, `<style>\n${project.codeCss}\n</style>`)
+    .replace(/<script[^>]+src="game\.js"[^>]*><\/script>/i, `<script>\n${project.codeJs}\n</script>`);
+}
+
+function PlayTab({ project, hasTinkered }: { project: Project; hasTinkered: boolean }) {
+  // After a tinker is applied, run the actual code strings in a sandboxed iframe
+  // so the live game reflects the exact change the kid just made.
+  if (hasTinkered) {
+    return (
+      <div className="bg-surface rounded-xl shadow-md overflow-hidden">
+        <div className="px-5 pt-4 pb-2 flex items-center gap-2">
+          <span className="text-tiny font-semibold text-success bg-success-soft rounded-pill px-3 h-6 inline-flex items-center">✓ Running your tinkered code</span>
+        </div>
+        <iframe
+          srcDoc={buildIframeDoc(project)}
+          sandbox="allow-scripts"
+          className="w-full h-[480px] border-0"
+          title="Tinkered live preview"
+        />
+      </div>
+    );
+  }
+
   if (project.projectType === "collector_game") {
     return (
       <div className="bg-surface rounded-xl shadow-md p-7">

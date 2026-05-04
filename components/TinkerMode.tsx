@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Project } from "@/lib/types";
 import type { TinkerFile, TinkerSuggestion } from "@/lib/tinker";
+import { calcTinkerHighlight } from "@/lib/tinker";
 
 export type TinkerModeProps = {
   project: Project;
@@ -52,8 +53,18 @@ export function TinkerMode({ project, applyEdit, onLookHere }: TinkerModeProps) 
 
   function onApply() {
     if (!suggestion) return;
+    const src =
+      suggestion.file === "js"
+        ? project.codeJs
+        : suggestion.file === "css"
+          ? project.codeCss
+          : project.codeHtml;
+    const lines =
+      suggestion.highlightLines && suggestion.highlightLines.length > 0
+        ? suggestion.highlightLines
+        : calcTinkerHighlight(src, suggestion.before, suggestion.after);
     applyEdit(suggestion.file, suggestion.before, suggestion.after);
-    onLookHere?.(suggestion.file, suggestion.highlightLines ?? []);
+    onLookHere?.(suggestion.file, lines);
     setMode("applied");
   }
 

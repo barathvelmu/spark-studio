@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { CodeFile } from "@/components/CodeView";
 import { CodeView } from "@/components/CodeView";
 import { CollectorGame } from "@/components/templates/CollectorGame";
 import { QuizGame } from "@/components/templates/QuizGame";
 import { StoryGame } from "@/components/templates/StoryGame";
-import { AskTheCodePanel } from "@/components/AskTheCodePanel";
+import { AskTheCodePanel, type AskTheCodePanelHandle } from "@/components/AskTheCodePanel";
 import { TinkerMode } from "@/components/TinkerMode";
 import type { TinkerFile } from "@/lib/tinker";
 import { RemixModal } from "@/components/RemixModal";
@@ -253,6 +253,8 @@ function CodeTab({
   onHighlight: (h: { file: CodeFile; lines: number[] }) => void;
   applyEdit: (file: TinkerFile, before: string, after: string) => void;
 }) {
+  const askRef = useRef<AskTheCodePanelHandle>(null);
+
   return (
     <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-6">
       <div className="space-y-6">
@@ -266,6 +268,7 @@ function CodeTab({
             highlightLines={highlight}
             onAskAboutLine={(file, line) => {
               onHighlight({ file, lines: [line] });
+              askRef.current?.ask(`What does line ${line} do?`);
             }}
           />
         </div>
@@ -279,6 +282,7 @@ function CodeTab({
         />
       </div>
       <AskTheCodePanel
+        ref={askRef}
         project={project}
         onLookHere={(file, lines) => {
           onActiveFile(file);

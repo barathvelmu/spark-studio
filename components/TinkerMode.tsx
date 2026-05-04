@@ -23,7 +23,16 @@ export function TinkerMode({ project, applyEdit, onLookHere }: TinkerModeProps) 
       const res = await fetch("/api/tinker", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId: project.id }),
+        body: JSON.stringify({
+          projectId: project.id,
+          project: {
+            id: project.id,
+            title: project.title,
+            codeHtml: project.codeHtml,
+            codeCss: project.codeCss,
+            codeJs: project.codeJs,
+          },
+        }),
       });
       if (res.status === 404) {
         setMode("none");

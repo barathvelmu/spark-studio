@@ -13,18 +13,10 @@
 const GEMINI_ENDPOINT =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-let _configured: boolean | undefined;
-
-function isConfigured(): boolean {
-  if (_configured !== undefined) return _configured;
-  const key = process.env.GEMINI_API_KEY;
-  _configured = typeof key === "string" && key.trim().length > 0;
-  return _configured;
-}
-
 /** Mirrors isAnthropicConfigured() — routes call this as a gate. */
 export function isAnthropicConfigured(): boolean {
-  return isConfigured();
+  const key = process.env.GEMINI_API_KEY;
+  return typeof key === "string" && key.trim().length > 0;
 }
 
 const SAFETY_RULES = `You are Spark Studio's AI helper. Spark Studio is a creative coding playground for kids ages 10-14.
@@ -42,7 +34,7 @@ Hard rules — NEVER violate:
  * Parameters used by routes:
  *   systemHint  — task-specific instructions appended after SAFETY_RULES
  *   userMessage — the user-facing prompt (idea, code snapshot, question, etc.)
- *   maxTokens   — soft output budget (default 2048); mapped to maxOutputTokens
+ *   maxTokens   — soft output budget (default 4096); mapped to maxOutputTokens
  *   effort      — ignored for Gemini (was an Anthropic-specific hint); accepted
  *                 for signature compatibility but not forwarded
  *   timeoutMs   — AbortController timeout in ms (default 20 000)
@@ -54,16 +46,16 @@ export async function askClaudeJson<T>(args: {
   effort?: "low" | "medium" | "high" | "xhigh" | "max";
   timeoutMs?: number;
 }): Promise<T | null> {
-  if (!isConfigured()) return null;
+  if (!isAnthropicConfigured()) return null;
 
   const apiKey = process.env.GEMINI_API_KEY as string;
-  const systemInstruction = `${SAFETY_RULES}\n\n${args.systemHint}`;
-  const maxOutputTokens = args.maxTokens ?? 2048;
-  const timeoutMs = args.timeoutMs ?? 20000;
+  const systemText = `${SAFETY_RULES}\n\n${args.systemHint}`;
+  const maxOutputTokens = args.maxTokens ?? 4096;
+  const timeoutMs = args.timeoutMs ?? 45000;
 
   const body = {
-    system_instruction: {
-      parts: [{ text: systemInstruction }],
+    systemInstruction: {
+      parts: [{ text: systemText }],
     },
     contents: [
       {
@@ -73,8 +65,9 @@ export async function askClaudeJson<T>(args: {
     ],
     generationConfig: {
       maxOutputTokens,
-      // Tell the model to return JSON so it doesn't wrap in markdown.
-      responseMimeType: "application/json",
+      // Disable thinking tokens — they consume the output budget before any
+      // visible text is emitted, leaving parts[] empty on low-token calls.
+      thinkingConfig: { thinkingBudget: 0 },
     },
   };
 
@@ -82,9 +75,12 @@ export async function askClaudeJson<T>(args: {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-    const res = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+    const res = await fetch(GEMINI_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
       body: JSON.stringify(body),
       signal: controller.signal,
     });
@@ -110,7 +106,13 @@ export async function askClaudeJson<T>(args: {
       return null;
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const candidate = data.candidates?.[0];
+    const finishReason = candidate?.finishReason;
+    if (finishReason && finishReason !== "STOP") {
+      console.warn("[gemini] non-STOP finishReason:", finishReason);
+      return null;
+    }
+    const text = candidate?.content?.parts?.[0]?.text;
     if (typeof text !== "string" || text.trim().length === 0) {
       console.warn("[gemini] empty or missing text in response");
       return null;

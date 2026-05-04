@@ -53,6 +53,13 @@ export async function POST(req: Request) {
       const source =
         ai.file === "js" ? project.codeJs : ai.file === "css" ? project.codeCss : project.codeHtml;
       if (typeof source === "string" && source.includes(ai.before)) {
+        // Always compute highlight lines so the client can show them even when Claude omits them.
+        if (!ai.highlightLines || ai.highlightLines.length === 0) {
+          const modified = source.replace(ai.before, ai.after);
+          const idx = modified.indexOf(ai.after);
+          const line = idx === -1 ? 0 : modified.slice(0, idx).split("\n").length;
+          if (line > 0) ai.highlightLines = [line];
+        }
         return NextResponse.json(ai);
       }
     }

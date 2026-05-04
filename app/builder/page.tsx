@@ -21,6 +21,25 @@ const typeOptions: Array<{ value: SelectableType; label: string; emoji: string }
   { value: "story", label: "Story", emoji: "📖" },
 ];
 
+const EXAMPLE_PROMPTS: Array<{ label: string; emoji: string; type: SelectableType }> = [
+  { label: "Ocean cleanup game", emoji: "🌊", type: "collector_game" },
+  { label: "Space junk collector", emoji: "🚀", type: "collector_game" },
+  { label: "Climate science quiz", emoji: "🧠", type: "quiz_game" },
+  { label: "Fantasy adventure story", emoji: "🧙", type: "story" },
+  { label: "Recycling hero game", emoji: "♻️", type: "collector_game" },
+];
+
+const UNSUPPORTED_PATTERNS = [
+  /\bstack(ing)?\b/i, /\bplatform(er)?\b/i, /\bjump(ing)?\b/i,
+  /\bshoot(er|ing)?\b/i, /\bfight(ing|er)?\b/i, /\brac(e|ing)\b/i,
+  /\bgta\b/i, /\bminecraft\b/i, /\broblox\b/i, /\bfps\b/i,
+  /\brpg\b/i, /\bbattle\b/i, /\bwar\b/i, /\bpuzzle\b/i,
+];
+
+function detectUnsupported(prompt: string): boolean {
+  return UNSUPPORTED_PATTERNS.some((re) => re.test(prompt));
+}
+
 export default function BuilderPage() {
   return (
     <Suspense fallback={<BuilderSkeleton />}>
@@ -144,6 +163,36 @@ function BuilderInner() {
             placeholder="A turtle collects plastic from the ocean…"
             disabled={isBuilding}
           />
+
+          {/* Unsupported idea warning */}
+          {detectUnsupported(prompt) && (
+            <div className="mt-3 flex items-start gap-2 bg-surface-muted border border-warning rounded-lg px-4 py-3">
+              <span className="text-base leading-none mt-px">🚧</span>
+              <div>
+                <p className="text-body-sm font-semibold text-text">That type isn't supported yet.</p>
+                <p className="text-tiny text-text-muted mt-0.5">Right now we can build collector games, quizzes, and stories. More game types coming soon — try one of the examples below!</p>
+              </div>
+            </div>
+          )}
+
+          {/* Example prompt chips */}
+          {!isBuilding && (
+            <div className="mt-4">
+              <p className="text-tiny text-text-muted font-semibold uppercase tracking-wide mb-2">Try one of these</p>
+              <div className="flex flex-wrap gap-2">
+                {EXAMPLE_PROMPTS.map((ex) => (
+                  <button
+                    key={ex.label}
+                    type="button"
+                    onClick={() => { setPrompt(ex.label); setProjectType(ex.type); }}
+                    className="rounded-pill bg-surface-muted hover:bg-primary-soft hover:text-primary text-text-muted text-tiny font-semibold px-3 h-7 transition-colors"
+                  >
+                    {ex.emoji} {ex.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <label className="block text-body-sm font-semibold mt-6 mb-2">Project type</label>
           <div className="flex flex-wrap gap-2">

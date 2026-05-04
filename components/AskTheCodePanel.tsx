@@ -101,7 +101,7 @@ function AskTheCodePanel({ project, onLookHere }, ref) {
         <p className="text-body-sm text-text-muted">I only know about <em>this</em> project.</p>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-auto space-y-3 pr-1" aria-live="polite">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto max-h-[320px] space-y-3 pr-1" aria-live="polite">
         {empty && (
           <div className="text-center py-8">
             <div className="text-5xl mb-4">💬</div>

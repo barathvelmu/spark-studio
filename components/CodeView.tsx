@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, type JSX, type KeyboardEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type JSX, type KeyboardEvent } from "react";
 
 export type CodeFile = "html" | "css" | "js";
 
@@ -167,6 +167,19 @@ export function CodeView(props: CodeViewProps): JSX.Element {
   const [internalFile, setInternalFile] = useState<CodeFile>("html");
   const current: CodeFile = activeFile ?? internalFile;
   const tablistId = useId();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the first highlighted line whenever the highlight changes.
+  useEffect(() => {
+    if (!highlightLines || highlightLines.file !== current || highlightLines.lines.length === 0) return;
+    const lineNo = highlightLines.lines[0];
+    const container = scrollRef.current;
+    if (!container) return;
+    const lineEl = container.querySelector<HTMLElement>(`[data-line="${lineNo}"]`);
+    if (lineEl) {
+      lineEl.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }, [highlightLines, current]);
 
   const setFile = (f: CodeFile) => {
     if (activeFile === undefined) setInternalFile(f);
@@ -238,6 +251,7 @@ export function CodeView(props: CodeViewProps): JSX.Element {
 
       {/* Code area */}
       <div
+        ref={scrollRef}
         className="bg-code-bg text-code-text rounded-xl p-6 font-mono text-code max-h-[480px] overflow-auto overflow-x-auto"
         aria-live="polite"
       >
@@ -249,6 +263,7 @@ export function CodeView(props: CodeViewProps): JSX.Element {
               return (
                 <div
                   key={lineNo}
+                  data-line={lineNo}
                   className={[
                     "group relative flex items-start whitespace-pre",
                     "border-l-[3px] pl-3 -mx-3",

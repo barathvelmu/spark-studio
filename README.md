@@ -1,6 +1,6 @@
 # Spark Studio 🌟
 
-A remix-first AI coding playground for kids. Describe an idea, watch it become a playable mini-project, look at the real code behind it, ask questions about how it works, remix it into something new, and learn the coding concepts behind every change the AI makes.
+A remix-first AI coding playground for kids. Describe an idea, watch it become a playable mini-project, look at the real code behind it, ask questions about how it works, remix it into something new, and learn the coding concepts behind every change the AI makes. See [demo](https://youtu.be/5Gxh25fKweY?si=2usnTpETTd_THqQv).
 
 > Every AI-generated change becomes a learning moment.
 

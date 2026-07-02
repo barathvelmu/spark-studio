@@ -53,7 +53,7 @@ Most AI coding tools assume you already know what a repository or a deploy is. W
 git clone https://github.com/barathvelmu/spark-studio.git
 cd spark-studio
 npm install
-cp .env.example .env.local           # then paste your ANTHROPIC_API_KEY
+cp .env.example .env.local           # paste your ANTHROPIC_API_KEY (optional, mocks cover the demo path without it)
 npm run dev
 ```
 
